@@ -2,7 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { HandHeart, Network, PartyPopper, Quote, Send, Users } from 'lucide-react';
 import { useLang } from '../../lib/i18n';
 import { fromSource, thumb } from '../../lib/media';
-import { alumniVoices, school } from '../../content/site';
+import { alumniVoices } from '../../content/site';
+import { db } from '../../data/db';
 import { Field, PageHero, Photo, Reveal, SectionHead, inputCls, useLightbox } from '../../components/ui';
 
 const YEARS = Array.from({ length: 2026 - 2000 + 1 }, (_, i) => String(2026 - i));
@@ -22,15 +23,17 @@ export default function Alumni() {
     { icon: PartyPopper, h: tr('Celebrate', 'Sherehekea'), p: tr('Share your milestones and career growth with the family.', 'Shiriki mafanikio yako na familia ya Green Acres.') },
   ];
 
+  const [done, setDone] = useState(false);
   const register = (e: FormEvent) => {
     e.preventDefault();
-    const body = `Green Acres alumni registration\nName: ${f.name}\nYear finished: ${f.year}\nLevel attended: ${f.level}\nProfession: ${f.work}\nPhone: ${f.phone}\nEmail: ${f.email}`;
-    window.location.href = `mailto:${school.email}?subject=${encodeURIComponent('Alumni registration: ' + f.name)}&body=${encodeURIComponent(body)}`;
+    db.registerAlumnus(f);
+    setDone(true);
   };
 
   return (
     <>
       <PageHero
+        page="alumni"
         kicker={tr('ALUMNI', 'WAHITIMU')}
         title={tr('Once Green Acres, always family.', 'Mara moja Green Acres, daima familia.')}
         lead={tr('Since 2000 we have nurtured thousands of learners who now lead, build and serve across Tanzania and the world.', 'Tangu 2000 tumelea maelfu ya wanafunzi ambao sasa wanaongoza, wanajenga na kuhudumia Tanzania na dunia.')}
@@ -83,7 +86,13 @@ export default function Alumni() {
             ))}
           </div>
         </div>
-        <form onSubmit={register} className="rounded-3xl border border-line bg-white p-6 sm:p-8">
+        {done ? (
+          <div className="flex flex-col justify-center rounded-[32px] bg-green-900 p-10 text-white animate-fadeUp">
+            <div className="font-display text-5xl">{tr('Karibu tena,', 'Karibu tena,')} <em className="text-gold-400">{f.name.split(' ')[0]}.</em></div>
+            <p className="text-lg text-white/75">{tr('You are on the alumni list. Invitations and news will reach you by SMS and email.', 'Uko kwenye orodha ya wahitimu. Mialiko na habari zitakufikia kwa SMS na barua pepe.')}</p>
+          </div>
+        ) : (
+        <form onSubmit={register} className="rounded-[32px] bg-white p-6 shadow-card sm:p-10">
           <h2 className="mb-5 mt-0 font-display text-2xl font-extrabold">{tr('Join the alumni network', 'Jiunge na mtandao wa wahitimu')}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={tr('Full name', 'Jina kamili')} className="sm:col-span-2"><input required value={f.name} onChange={set('name')} className={inputCls} autoComplete="name" /></Field>
@@ -96,8 +105,8 @@ export default function Alumni() {
           <button type="submit" className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-green-600 font-bold text-white hover:bg-green-700">
             <Send className="h-4 w-4" aria-hidden="true" /> {tr('Register', 'Jisajili')}
           </button>
-          <p className="mb-0 mt-3 text-xs text-ink-3">{tr('This opens your email app with your details filled in, addressed to info@greenacres.ac.tz.', 'Hii inafungua barua pepe yako ikiwa na taarifa zako, kwenda info@greenacres.ac.tz.')}</p>
         </form>
+        )}
       </section>
       {lb.node}
     </>

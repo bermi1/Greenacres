@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { BarChart3, ClipboardCheck, FileText, Image, LogOut, Newspaper, Send, Settings, ShieldCheck, Users } from 'lucide-react';
 import StaffShell, { Badge, btnGhost, btnGold, btnPrimary, card } from '../../components/StaffShell';
 import { Crest } from '../../components/SiteLayout';
 import { img, mediaCount } from '../../lib/media';
 import { posts } from '../../content/site';
+import { useDb } from '../../data/db';
 import { inputCls } from '../../components/ui';
 
 function readSignedIn() {
@@ -28,6 +29,14 @@ const TILES = [
 
 export default function Dashboard() {
   const [signed, setSigned] = useState(readSignedIn);
+  const [params] = useSearchParams();
+  const go = useNavigate();
+  const apps = useDb((t) => t.applications.length);
+  const newApps = useDb((t) => t.applications.filter((a) => !a.sample).length);
+  const unread = useDb((t) => t.messages.filter((m) => !m.read).length);
+  const msgs = useDb((t) => t.messages.length);
+  const subs = useDb((t) => t.subscribers.length);
+  const audit = useDb((t) => t.audit);
   const [done, setDone] = useState<Record<number, boolean>>({ 1: true });
   const setSession = (v: boolean) => {
     setSigned(v);
@@ -52,10 +61,10 @@ export default function Dashboard() {
           <div className="relative text-sm text-[#9FC2AA]">Built by Bermi Techs · concept prototype</div>
         </div>
         <div className="grid place-items-center bg-paper px-4 py-12">
-          <form onSubmit={(e) => { e.preventDefault(); setSession(true); }} className={`${card} w-full max-w-md p-7`}>
+          <form onSubmit={(e) => { e.preventDefault(); setSession(true); const next = params.get('next'); if (next?.startsWith('/')) go(next); }} className={`${card} w-full max-w-md p-7`}>
             <div className="mb-5 flex items-center gap-3 lg:hidden"><Crest /><span className="font-display font-extrabold">Green Acres Control Centre</span></div>
             <h2 className="m-0 font-display text-2xl font-extrabold">Staff sign in</h2>
-            <p className="mb-5 mt-1 text-sm text-ink-3">Demo: any email and password will open the dashboard.</p>
+            <p className="mb-5 mt-1 text-sm text-ink-3">Sign in with your school account. Until staff accounts are connected, any email and password opens the dashboard.</p>
             <label className="mb-4 flex flex-col gap-1.5 text-sm font-semibold">Work email<input type="email" required placeholder="name@greenacres.ac.tz" className={inputCls} autoComplete="username" /></label>
             <label className="mb-4 flex flex-col gap-1.5 text-sm font-semibold">Password<input type="password" required placeholder="••••••••" className={inputCls} autoComplete="current-password" /></label>
             <label className="mb-5 flex items-center gap-2.5 text-sm"><input type="checkbox" className="h-4 w-4 accent-green-600" />Keep me signed in on this device</label>
@@ -84,7 +93,7 @@ export default function Dashboard() {
       }
     >
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[['Applications (2027)', '7', 'Sample, from Admissions'], ['SMS rate', 'TZS 18', 'per SMS via Bermi Connect'], ['Website pages live', '10', `${posts.length} news posts`], ['Media library', String(mediaCount), 'photos imported']].map(([k, v, s]) => (
+        {[['Applications (2027)', String(apps), `${newApps} new from the website`], ['Inbox', String(unread), `${msgs} messages · ${subs} subscribers`], ['News posts', String(posts.length), 'live on the website'], ['Media library', String(mediaCount), 'photos imported']].map(([k, v, s]) => (
           <div key={k} className={`${card} p-4`}>
             <div className="text-[13px] text-ink-3">{k}</div>
             <div className="font-display text-2xl font-extrabold">{v}</div>
@@ -118,17 +127,17 @@ export default function Dashboard() {
           </div>
         </section>
         <section className={`${card} p-5`}>
-          <h2 className="mb-3 mt-0 font-display text-lg font-extrabold">Recent website edits</h2>
+          <h2 className="mb-3 mt-0 font-display text-lg font-extrabold">Recent activity</h2>
           <div className="flex flex-col gap-2">
-            {[['JR', 'Home · hero text updated (SW)', 'Published'], ['AM', 'Admissions · 2027 joining instructions', 'Draft'], ['SK', 'News · Cultural Day photos', 'Published'], ['AM', 'Facilities · new labs gallery', 'Draft']].map(([who, what, st]) => (
+            {(audit.length ? audit.slice(0, 5).map((a) => [a.who.slice(0, 2).toUpperCase(), a.what, new Date(a.at).toLocaleDateString('en-GB')]) : [['GA', 'No activity yet. Edits, sends and stage moves appear here.', '']]).map(([who, what, st]) => (
               <div key={what} className="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5">
                 <span className="grid h-8 w-8 place-items-center rounded-full bg-green-100 text-xs font-bold text-green-600">{who}</span>
                 <span className="flex-1 text-sm">{what}</span>
-                <Badge tone={st === 'Published' ? 'green' : 'gold'}>{st}</Badge>
+                {st && <Badge tone="grey">{st}</Badge>}
               </div>
             ))}
           </div>
-          <div className="mt-2 text-xs text-ink-3">Sample activity</div>
+
         </section>
       </div>
     </StaffShell>

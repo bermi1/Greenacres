@@ -3,6 +3,7 @@ import { Eye, EyeOff, ImageIcon, Plus } from 'lucide-react';
 import StaffShell, { Badge, btnGhost, btnPrimary, card } from '../../components/StaffShell';
 import { Field, Toast, inputCls } from '../../components/ui';
 import { img } from '../../lib/media';
+import { db, useDb } from '../../data/db';
 
 const PAGES: [string, string, string][] = [['home', 'Home', '4'], ['about', 'About', 'kwa-niaba-ya-waziri-wa-elimu-prof-nkenda-6'], ['academics', 'Academics', 'learning-in-motion-our-green-acres-teach'], ['admissions', 'Admissions', 'a-week-back-in-the-groove-at-green-acres'], ['facilities', 'Facilities', '2-2'], ['alumni', 'Alumni', 'get'], ['gallery', 'Gallery', 'p1336293-7'], ['news', 'News & events', 'p1336273-1'], ['results', 'Results', 'graduation'], ['contact', 'Contact', 'skonga']];
 const DRAFTS = new Set(['admissions', 'facilities']);
@@ -17,16 +18,19 @@ export default function Pages() {
   const [lang, setLang] = useState<'en' | 'sw'>('en');
   const [content, setContent] = useState<Record<string, [string, string, string]>>({});
   const [hidden, setHidden] = useState<Record<string, boolean>>({});
-  const [status, setStatus] = useState('Published');
+  const savedAll = useDb((t) => t.pages);
+  const [dirty, setDirty] = useState(false);
   const [toast, setToast] = useState('');
   const def = PAGES.find((p) => p[0] === page)!;
   const key = `${page}:${lang}`;
-  const c = content[key] ?? DEFAULTS[page]?.[lang] ?? [def[1], lang === 'en' ? 'Introduction text for this page.' : 'Maelezo ya utangulizi wa ukurasa huu.', lang === 'en' ? 'Learn more' : 'Soma zaidi'];
+  const saved = savedAll[page]?.[lang];
+  const status = dirty ? 'Unsaved changes' : saved?.status ?? (DRAFTS.has(page) ? 'Draft' : 'Published');
+  const c = content[key] ?? (saved ? ([saved.heading, saved.intro, saved.cta] as [string, string, string]) : undefined) ?? DEFAULTS[page]?.[lang] ?? [def[1], lang === 'en' ? 'Introduction text for this page.' : 'Maelezo ya utangulizi wa ukurasa huu.', lang === 'en' ? 'Learn more' : 'Soma zaidi'];
   const setField = (i: 0 | 1 | 2) => (e: { target: { value: string } }) => {
     const next = [...c] as [string, string, string];
     next[i] = e.target.value;
     setContent({ ...content, [key]: next });
-    setStatus('Unsaved changes');
+    setDirty(true);
   };
   const blocks: [string, string][] = [['TEXT', 'Our story / introduction'], ['CARDS', 'Highlight cards'], ['GALLERY', 'Photo strip'], ['CTA', 'Apply or contact banner']];
   const tog = (on: boolean) => `min-h-[34px] rounded-full px-3 text-[13px] font-semibold ${on ? 'bg-green-600 text-white' : 'text-ink-2'}`;
@@ -38,8 +42,8 @@ export default function Pages() {
       actions={
         <>
           <Badge tone={status === 'Published' ? 'green' : status === 'Draft' ? 'gold' : 'red'}>{status}</Badge>
-          <button type="button" className={btnGhost} onClick={() => { setStatus('Draft'); setToast('Draft saved. Only staff can see it.'); }}>Save draft</button>
-          <button type="button" className={btnPrimary} onClick={() => { setStatus('Published'); setToast(`${def[1]} is live in English and Kiswahili.`); }}>Publish</button>
+          <button type="button" className={btnGhost} onClick={() => { db.savePage(page, lang, { heading: c[0], intro: c[1], cta: c[2], status: 'Draft' }); setDirty(false); setToast('Draft saved. Only staff can see it.'); }}>Save draft</button>
+          <button type="button" className={btnPrimary} onClick={() => { db.savePage(page, lang, { heading: c[0], intro: c[1], cta: c[2], status: 'Published' }); setDirty(false); setToast(`${def[1]} (${lang === 'en' ? 'English' : 'Kiswahili'}) is live. Open the website to see it.`); }}>Publish</button>
         </>
       }
     >
@@ -47,7 +51,7 @@ export default function Pages() {
       <div className="grid gap-4 xl:grid-cols-[200px_1fr_1fr]">
         <section aria-label="Pages" className={`${card} no-scrollbar flex gap-1 overflow-x-auto p-2 xl:flex-col`}>
           {PAGES.map(([id, label]) => (
-            <button key={id} type="button" onClick={() => { setPage(id); setStatus(DRAFTS.has(id) ? 'Draft' : 'Published'); setToast(''); }} aria-pressed={page === id} className={`flex min-h-[40px] flex-none items-center gap-2 rounded-lg px-3 text-left text-sm ${page === id ? 'bg-green-50 font-bold text-green-600' : 'hover:bg-paper'}`}>
+            <button key={id} type="button" onClick={() => { setPage(id); setDirty(false); setToast(''); }} aria-pressed={page === id} className={`flex min-h-[40px] flex-none items-center gap-2 rounded-lg px-3 text-left text-sm ${page === id ? 'bg-green-50 font-bold text-green-600' : 'hover:bg-paper'}`}>
               <span className={`h-2 w-2 rounded-full ${DRAFTS.has(id) ? 'bg-gold-500' : 'bg-green-600'}`} />
               {label}
             </button>
@@ -80,7 +84,7 @@ export default function Pages() {
             return (
               <div key={type} className={`flex items-center justify-between gap-3 rounded-xl border border-line px-4 py-3 ${h ? 'opacity-60' : ''}`}>
                 <div className="flex items-center gap-2"><Badge tone="grey">{type}</Badge><span className="text-sm font-semibold">{title}</span></div>
-                <button type="button" onClick={() => { setHidden({ ...hidden, [page + i]: !h }); setStatus('Unsaved changes'); }} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-line-2 px-3 text-xs font-semibold">
+                <button type="button" onClick={() => { setHidden({ ...hidden, [page + i]: !h }); setDirty(true); }} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-line-2 px-3 text-xs font-semibold">
                   {h ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />} {h ? 'Hidden' : 'Visible'}
                 </button>
               </div>

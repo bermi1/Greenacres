@@ -68,21 +68,21 @@ export const levels = [
     pointsSw: ['Kujifunza kwa michezo', 'Kusoma na kuhesabu mapema', 'Stadi za kijamii na udadisi'],
   },
   {
-    id: 'pri', n: '02', en: 'Primary', sw: 'Msingi', ageEn: 'STANDARD 1–7', ageSw: 'DARASA 1–7', photo: '1',
+    id: 'pri', n: '02', en: 'Primary', sw: 'Msingi', ageEn: 'STANDARD 1 to 7', ageSw: 'DARASA 1 HADI 7', photo: '1',
     textEn: 'The national curriculum taught in English, enriched with ICT, arts, music, sports and values education, building strong skills, critical thinking and discipline.',
     textSw: 'Mtaala wa taifa unafundishwa kwa Kiingereza, pamoja na TEHAMA, sanaa, muziki, michezo na elimu ya maadili, kujenga ujuzi, fikra na nidhamu.',
     pointsEn: ['Core subjects taught in English', 'ICT, arts and music', 'Sports and values education'],
     pointsSw: ['Masomo ya msingi kwa Kiingereza', 'TEHAMA, sanaa na muziki', 'Michezo na elimu ya maadili'],
   },
   {
-    id: 'ol', n: '03', en: 'O-Level', sw: 'Kidato I–IV', ageEn: 'FORM I–IV', ageSw: 'KIDATO I–IV', photo: 'a-week-back-in-the-groove-at-green-acres-2',
+    id: 'ol', n: '03', en: 'O-Level', sw: 'Kidato I hadi IV', ageEn: 'FORM I to IV', ageSw: 'KIDATO I HADI IV', photo: 'a-week-back-in-the-groove-at-green-acres-2',
     textEn: 'A rigorous programme for national examinations and life beyond the classroom, with expert subject teachers, modern science and computer labs, and structured mentorship.',
     textSw: 'Programu madhubuti ya mitihani ya taifa na maisha nje ya darasa, walimu mahiri, maabara za kisasa za sayansi na kompyuta, na ushauri maalum.',
     pointsEn: ['Physics, Chemistry and Biology labs', 'Computer lab with high-speed internet', 'Day and boarding'],
     pointsSw: ['Maabara za Fizikia, Kemia na Biolojia', 'Maabara ya kompyuta yenye intaneti ya kasi', 'Kutwa na bweni'],
   },
   {
-    id: 'al', n: '04', en: 'A-Level', sw: 'Kidato V–VI', ageEn: 'FORM V–VI', ageSw: 'KIDATO V–VI', photo: '4',
+    id: 'al', n: '04', en: 'A-Level', sw: 'Kidato V hadi VI', ageEn: 'FORM V to VI', ageSw: 'KIDATO V HADI VI', photo: '4',
     textEn: 'Specialised combinations in Science, Business or Arts, with leadership training, career guidance and university preparation for confident, ethical graduates.',
     textSw: 'Michepuo ya Sayansi, Biashara au Sanaa, pamoja na mafunzo ya uongozi, ushauri wa taaluma na maandalizi ya chuo kikuu.',
     pointsEn: ['Science, Business and Arts combinations', 'Career guidance', 'University preparation'],
@@ -146,8 +146,8 @@ export const faqs = [
     'Fill in the admission form online (student and parent details), or visit the admissions office. Download the joining instructions for your child’s level below.',
     'Jaza fomu ya maombi mtandaoni (taarifa za mwanafunzi na mzazi), au tembelea ofisi ya udahili. Pakua maelekezo ya kujiunga ya darasa husika hapa chini.'],
   ['Which levels accept applications?', 'Ngazi zipi zinapokea maombi?',
-    'Nursery, Primary, Pre-Form 1, Secondary (Form I–IV), Pre-Form 5 and High School (A-Level). Form One 2027 admission is open now.',
-    'Awali, Msingi, Pre-Form 1, Sekondari (Kidato I–IV), Pre-Form 5 na A-Level. Udahili wa Kidato cha Kwanza 2027 uko wazi sasa.'],
+    'Nursery, Primary, Pre-Form 1, Secondary (Form I to IV), Pre-Form 5 and High School (A-Level). Form One 2027 admission is open now.',
+    'Awali, Msingi, Pre-Form 1, Sekondari (Kidato I hadi IV), Pre-Form 5 na A-Level. Udahili wa Kidato cha Kwanza 2027 uko wazi sasa.'],
   ['Do you offer boarding?', 'Mna huduma ya bweni?',
     'Yes. Secondary students can board in supervised dormitories at the Dar es Salaam campus. Day places are also available.',
     'Ndiyo. Wanafunzi wa sekondari wanaweza kukaa bweni linalosimamiwa katika kampasi ya Dar es Salaam. Nafasi za kutwa pia zipo.'],
@@ -162,7 +162,7 @@ export const faqs = [
 /** Events listed on the old News & Events page. The page gave days and venues but no year. */
 export const events = [
   { d: '11', mEn: 'May', mSw: 'Mei', en: '25 Years Anniversary', sw: 'Maadhimisho ya miaka 25', venue: 'Mlimani City', time: '10:00 AM' },
-  { d: '15', mEn: 'Jun', mSw: 'Jun', en: 'Alumni get-together', sw: 'Mkusanyiko wa wahitimu', venue: 'Giraffe Hotel', time: '10:00 AM – 5:00 PM' },
+  { d: '15', mEn: 'Jun', mSw: 'Jun', en: 'Alumni get-together', sw: 'Mkusanyiko wa wahitimu', venue: 'Giraffe Hotel', time: '10:00 AM, 5:00 PM' },
   { d: '24', mEn: 'Jul', mSw: 'Jul', en: 'Career building in Artificial Intelligence', sw: 'Taaluma katika Akili Bandia (AI)', venue: 'Urayana Hall', time: '10:00 AM' },
   { d: '11', mEn: 'Aug', mSw: 'Ago', en: 'Innovation in arts and culture', sw: 'Ubunifu katika sanaa na utamaduni', venue: 'Urayana Hall', time: '10:00 AM' },
 ];
@@ -237,7 +237,7 @@ export const results = [
       { en: 'School average', sw: 'Wastani wa shule', v: '289.57' },
       { en: 'District rank', sw: 'Nafasi wilayani', v: '1st' },
     ],
-    rows: [{ a: 'Bunazi Green Acres', b: '77 pupils', c: 'All Grade A · average 289.57' }, { a: 'DSM Green Acres', b: '—', c: 'Outstanding performance (see the full post)' }],
+    rows: [{ a: 'Bunazi Green Acres', b: '77 pupils', c: 'All Grade A · average 289.57' }, { a: 'DSM Green Acres', b: ', ', c: 'Outstanding performance (see the full post)' }],
   },
   {
     id: 'sfna', en: 'Grade Four 2025', sw: 'Darasa la Nne 2025', k: 'SFNA 2025', post: 'outstanding-performance-bunazi-green-acres-top-school-in-missenyi-grade-four-2025',
@@ -263,8 +263,8 @@ export const results = [
     stats: [
       { en: 'Candidates', sw: 'Watahiniwa', v: '32' },
       { en: 'Division I', sw: 'Daraja I', v: '17' },
-      { en: 'Division I–II', sw: 'Daraja I–II', v: '66%' },
-      { en: 'Division I–III', sw: 'Daraja I–III', v: '88%' },
+      { en: 'Division I to II', sw: 'Daraja I to II', v: '66%' },
+      { en: 'Division I to III', sw: 'Daraja I to III', v: '88%' },
     ],
     rows: [
       { a: 'Division I', b: '17', c: '53%' },

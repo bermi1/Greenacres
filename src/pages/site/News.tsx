@@ -3,25 +3,29 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarDays, Clock, MapPin, MessageCircle, Play } from 'lucide-react';
 import { useLang } from '../../lib/i18n';
 import { niceDate } from '../../lib/format';
-import { events, posts, school } from '../../content/site';
+import { events, posts } from '../../content/site';
 import { PageHero, Photo, Pill, Reveal, inputCls } from '../../components/ui';
+import { db, useDb } from '../../data/db';
 
 export default function News() {
   const { tr, lang } = useLang();
   const [tab, setTab] = useState<'all' | 'news' | 'results'>('all');
   const [phone, setPhone] = useState('');
-  const shown = posts.filter((p) => tab === 'all' || (tab === 'results' ? p.category === 'Results' : p.category !== 'Results'));
+  const [joined, setJoined] = useState(false);
+  const status = useDb((t) => t.postStatus);
+  const shown = posts.filter((p) => (status[p.slug] ?? 'Published') === 'Published').filter((p) => tab === 'all' || (tab === 'results' ? p.category === 'Results' : p.category !== 'Results'));
   const [first, ...rest] = shown;
 
   const subscribe = (e: FormEvent) => {
     e.preventDefault();
-    const text = encodeURIComponent(`Habari Green Acres, naomba kupokea habari na matangazo ya shule kwa SMS/WhatsApp. Namba yangu: ${phone}`);
-    window.open(`https://wa.me/${school.whatsapp}?text=${text}`, '_blank', 'noopener');
+    db.subscribe(phone.trim());
+    setJoined(true);
   };
 
   return (
     <>
       <PageHero
+        page="news"
         kicker={tr('NEWS & EVENTS', 'HABARI NA MATUKIO')}
         title={tr('What is happening at Green Acres.', 'Kinachoendelea Green Acres.')}
         lead={tr('Results, clubs, celebrations and events from our campuses, always dated.', 'Matokeo, klabu, sherehe na matukio kutoka kampasi zetu, kila mara kwa tarehe.')}
@@ -93,11 +97,12 @@ export default function News() {
             <form onSubmit={subscribe} className="rounded-3xl bg-gold-400 p-6">
               <div className="font-display text-lg font-extrabold">{tr('Get updates', 'Pata taarifa')}</div>
               <p className="mb-3 mt-1 text-sm text-[#3D3A1F]">{tr('Announcements, events and term dates on WhatsApp or SMS.', 'Matangazo, matukio na tarehe za muhula kwa WhatsApp au SMS.')}</p>
+              {joined ? <div className="rounded-2xl bg-white/70 p-4 font-semibold">{tr('Subscribed. Asante!', 'Umejisajili. Asante!')}</div> : <>
               <label className="sr-only" htmlFor="sub-phone">{tr('Phone number', 'Namba ya simu')}</label>
               <input id="sub-phone" required value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" placeholder="+255 7__ ___ ___" className={inputCls} />
               <button type="submit" className="mt-3 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-green-800 font-bold text-white">
-                <MessageCircle className="h-4 w-4" aria-hidden="true" /> {tr('Subscribe on WhatsApp', 'Jisajili kwa WhatsApp')}
-              </button>
+                <MessageCircle className="h-4 w-4" aria-hidden="true" /> {tr('Subscribe', 'Jisajili')}
+              </button></>}
             </form>
 
             <Link to="/gallery" className="group relative block h-48 overflow-hidden rounded-3xl text-white no-underline">

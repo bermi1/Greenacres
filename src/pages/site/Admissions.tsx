@@ -21,6 +21,7 @@ export default function Admissions() {
   return (
     <>
       <PageHero
+        page="admissions"
         kicker={tr('ADMISSIONS 2027', 'UDAHILI 2027')}
         title={tr('Join the Green Acres family.', 'Jiunge na familia ya Green Acres.')}
         lead={tr('A simple, transparent and supportive admission process for every level, from Nursery to A-Level.', 'Mchakato rahisi, wa wazi na wenye msaada kwa kila ngazi, kuanzia Awali hadi A-Level.')}

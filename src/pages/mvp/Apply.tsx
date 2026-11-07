@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { db, storageMode } from '../../data/db';
 import { Check, CheckCircle2, FileText, Phone, Sparkles, Upload, X } from 'lucide-react';
 import { useLang } from '../../lib/i18n';
 import { Crest, LangToggle } from '../../components/SiteLayout';
@@ -9,9 +10,11 @@ type Docs = Record<'birth' | 'report' | 'photo', string>;
 
 export default function Apply() {
   const { tr } = useLang();
+  const [params] = useSearchParams();
   const [step, setStep] = useState(0);
-  const [level, setLevel] = useState('f1');
-  const [mode, setMode] = useState('board');
+  const [level, setLevel] = useState(() => (['nur', 'pri', 'pf1', 'f1', 'pf5', 'f5'].includes(params.get('level') ?? '') ? params.get('level')! : 'f1'));
+  const [mode, setMode] = useState(() => (params.get('mode') === 'day' ? 'day' : 'board'));
+  const [ref, setRef] = useState('');
   const [pay, setPay] = useState('mpesa');
   const [student, setStudent] = useState({ name: '', dob: '', gender: 'girl', prev: '' });
   const [parent, setParent] = useState({ name: '', rel: 'mother', phone: '', email: '', address: '', channel: 'SMS', consent: true });
@@ -29,8 +32,8 @@ export default function Apply() {
   const docCount = 3 - missing.length;
   const first = student.name.trim().split(/\s+/)[0] || tr('your child', 'mtoto wako');
   const sms = tr(
-    `Green Acres: We received ${first}'s ${levelLabel} 2027 application. Ref: GA-27-0148. Your interview date will follow by SMS. Questions? Reply to this message.`,
-    `Green Acres: Tumepokea maombi ya ${first} ${levelLabel} 2027. Namba ya kumbukumbu: GA-27-0148. Tarehe ya usaili itatumwa kwa SMS. Maswali? Jibu ujumbe huu.`,
+    `Green Acres: We received ${first}'s ${levelLabel} 2027 application. Ref: ${ref}. Your interview date will follow by SMS. Questions? Reply to this message.`,
+    `Green Acres: Tumepokea maombi ya ${first} ${levelLabel} 2027. Namba ya kumbukumbu: ${ref}. Tarehe ya usaili itatumwa kwa SMS. Maswali? Jibu ujumbe huu.`,
   );
   const canNext = step === 0 ? student.name.trim().length > 2 : step === 1 ? parent.name.trim().length > 2 && parent.phone.replace(/\D/g, '').length >= 9 && parent.consent : true;
   const choice = (on: boolean) => `min-h-[44px] rounded-full border px-4 text-sm font-semibold transition ${on ? 'border-green-600 bg-green-600 text-white' : 'border-line-2 bg-white text-ink hover:border-green-600'}`;
@@ -184,7 +187,7 @@ export default function Apply() {
                   <p className="m-0 mt-1 text-ink-3">{tr('The application fee is paid once.', 'Ada ya maombi hulipwa mara moja tu.')}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {[[tr('Student', 'Mwanafunzi'), student.name || '—'], [tr('Level', 'Darasa'), levelLabel], [tr('Mode', 'Aina'), modeLabel], [tr('Documents', 'Nyaraka'), `${docCount} / 3`]].map(([k, v]) => (
+                  {[[tr('Student', 'Mwanafunzi'), student.name || ', '], [tr('Level', 'Darasa'), levelLabel], [tr('Mode', 'Aina'), modeLabel], [tr('Documents', 'Nyaraka'), `${docCount} / 3`]].map(([k, v]) => (
                     <div key={k} className="rounded-xl bg-paper p-3.5">
                       <div className="text-xs text-ink-3">{k}</div>
                       <div className="font-bold">{v}</div>
@@ -214,11 +217,11 @@ export default function Apply() {
                   <p className="m-0 leading-relaxed text-ink-2">{tr('We have sent an SMS with your reference number. Your interview date will follow within 3 working days.', 'Tumetuma SMS yenye namba yako ya kumbukumbu. Tarehe ya usaili itatumwa ndani ya siku 3 za kazi.')}</p>
                   <div className="mt-5 inline-flex items-center gap-3 rounded-xl bg-paper px-4 py-3">
                     <span className="text-sm text-ink-3">{tr('Reference', 'Namba ya kumbukumbu')}</span>
-                    <span className="font-display text-lg font-extrabold">GA-27-0148</span>
+                    <span className="font-display text-lg font-extrabold">{ref}</span>
                   </div>
                   <div className="mt-5 flex flex-wrap gap-2">
                     <a
-                      href={`https://wa.me/255739222237?text=${encodeURIComponent(`Maombi ya kujiunga 2027 / Admission application 2027\nMwanafunzi: ${student.name} (${student.dob || '-'})\nDarasa: ${levelLabel} · ${modeLabel}\nShule aliyotoka: ${student.prev || '-'}\nMzazi: ${parent.name} · ${parent.phone} · ${parent.email || '-'}\nMakazi: ${parent.address || '-'}`)}`}
+                      href={`https://wa.me/255739222237?text=${encodeURIComponent(`Maombi ya kujiunga 2027 / Admission application 2027 (${ref})\nMwanafunzi: ${student.name} (${student.dob || '-'})\nDarasa: ${levelLabel} · ${modeLabel}\nShule aliyotoka: ${student.prev || '-'}\nMzazi: ${parent.name} · ${parent.phone} · ${parent.email || '-'}\nMakazi: ${parent.address || '-'}`)}`}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex min-h-[44px] items-center rounded-xl bg-green-600 px-5 font-bold text-white no-underline"
@@ -241,13 +244,19 @@ export default function Apply() {
             {step < 4 && (
               <div className="mt-8 flex justify-between gap-3 border-t border-line pt-5">
                 <button type="button" onClick={() => setStep(step - 1)} className={`min-h-[48px] rounded-xl border border-line-2 bg-white px-5 font-semibold ${step === 0 ? 'invisible' : ''}`}>{tr('Back', 'Rudi')}</button>
-                <button type="button" disabled={!canNext} onClick={() => setStep(step + 1)} className="min-h-[48px] rounded-xl bg-gold-400 px-6 font-bold text-ink transition disabled:cursor-not-allowed disabled:opacity-50">
+                <button type="button" disabled={!canNext} onClick={() => {
+                  if (step === 3) {
+                    const row = db.submitApplication({ student: { name: student.name, dob: student.dob, gender: student.gender, prevSchool: student.prev }, level: levelLabel, mode: modeLabel, parent: { name: parent.name, relation: parent.rel, phone: parent.phone, email: parent.email, address: parent.address, channel: parent.channel, consent: parent.consent }, docs, payMethod: pay });
+                    setRef(row.ref);
+                  }
+                  setStep(step + 1);
+                }} className="min-h-[48px] rounded-xl bg-gold-400 px-6 font-bold text-ink transition disabled:cursor-not-allowed disabled:opacity-50">
                   {step === 3 ? tr('Submit and pay', 'Wasilisha na ulipe') : tr('Continue', 'Endelea')}
                 </button>
               </div>
             )}
           </div>
-          <p className="mt-3 text-center text-xs text-ink-3">{tr('Concept prototype by Bermi Techs · nothing is submitted or charged · to apply today, call +255 782 128 633', 'Onyesho la Bermi Techs · hakuna kinachotumwa wala kulipishwa · kuomba leo, piga +255 782 128 633')}</p>
+          <p className="mt-3 text-center text-xs text-ink-3">{storageMode === 'local' ? tr('Your application is saved securely and appears in the admissions office pipeline. Payment prompts start once mobile money is connected. Questions: +255 782 128 633', 'Maombi yako yanahifadhiwa na kuonekana kwenye ofisi ya udahili. Ombi la malipo litaanza mara mfumo wa malipo ukiunganishwa. Maswali: +255 782 128 633') : tr('Questions? Call +255 782 128 633', 'Maswali? Piga +255 782 128 633')}</p>
         </main>
       </div>
     </div>

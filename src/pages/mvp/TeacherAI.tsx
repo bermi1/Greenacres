@@ -7,7 +7,7 @@ const SUBJECTS: [string, string, string][] = [['bio', 'Biology', 'Cell structure
 const BANK: Record<string, string[]> = {
   bio: ['Which organelle is the site of aerobic respiration? (A) Ribosome (B) Mitochondrion (C) Golgi body (D) Vacuole', 'Name two structures found in a plant cell but not in an animal cell, and state one function of each.', 'Explain why red blood cells cannot divide.', 'Draw and label a typical animal cell as seen under a light microscope.'],
   chem: ['How many moles are in 22 g of carbon dioxide? (C = 12, O = 16)', 'Define the term "molar mass" and give its SI unit.', 'Calculate the number of molecules in 0.5 mol of water. (L = 6.02 × 10²³)', "State Avogadro's law."],
-  phy: ['Distinguish between distance and displacement.', 'A car accelerates uniformly from rest to 20 m/s in 5 s. Find its acceleration.', 'Sketch a velocity–time graph for a body moving with uniform acceleration.', 'What does the area under a velocity–time graph represent?'],
+  phy: ['Distinguish between distance and displacement.', 'A car accelerates uniformly from rest to 20 m/s in 5 s. Find its acceleration.', 'Sketch a velocity, time graph for a body moving with uniform acceleration.', 'What does the area under a velocity, time graph represent?'],
   geo: ['Differentiate between weather and climate.', 'Name the instrument used to measure relative humidity.', 'Explain two factors that influence the climate of Dar es Salaam.', 'Describe how a Stevenson screen is constructed.'],
 };
 

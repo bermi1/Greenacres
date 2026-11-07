@@ -9,12 +9,12 @@ type Group = { id: string; title: string; text: string; images: string[]; video:
 
 const SW: Record<string, string> = {
   '25 Years Anniversary': 'Maadhimisho ya miaka 25',
-  'Maulid Day – A Celebration of Faith & Unity': 'Siku ya Maulid',
+  'Maulid Day, A Celebration of Faith & Unity': 'Siku ya Maulid',
   'Bujugo Day': 'Siku ya Bujugo',
   'Bukoba Airport School Trip': 'Ziara ya Uwanja wa Ndege Bukoba',
   'School Tour to Kagera Sugar Industry': 'Ziara ya Kiwanda cha Sukari Kagera',
-  'School Tour to Kaole Historical Site – Bagamoyo': 'Ziara ya Magofu ya Kaole, Bagamoyo',
-  'Form VI Graduation Day – Celebrating Success & New Beginnings': 'Mahafali ya Kidato cha Sita',
+  'School Tour to Kaole Historical Site, Bagamoyo': 'Ziara ya Magofu ya Kaole, Bagamoyo',
+  'Form VI Graduation Day, Celebrating Success & New Beginnings': 'Mahafali ya Kidato cha Sita',
   'Skonga TV Visits Green Acres Schools': 'Skonga TV yatembelea Green Acres',
 };
 
@@ -34,7 +34,7 @@ export default function Gallery() {
       .map((slug) => posts.find((p) => p.slug === slug)!)
       .filter(Boolean)
       .map((p) => ({ id: p.slug, title: tr(p.title, p.titleSw), text: p.excerpt, images: p.images, video: null, tag: tagFor(p.title) }));
-    const fromAlbums = albums.map((a, k) => ({ id: 'a' + k, title: tr(a.title.split(/! | – /)[0], SW[a.title] ?? a.title), text: a.text, images: a.images, video: a.video, tag: tagFor(a.title) }));
+    const fromAlbums = albums.map((a, k) => ({ id: 'a' + k, title: tr(a.title.split(/! |, /)[0], SW[a.title] ?? a.title), text: a.text, images: a.images, video: a.video, tag: tagFor(a.title) }));
     const campus = { id: 'campus', title: tr('Our campus and facilities', 'Kampasi na miundombinu'), text: '', images: [...fromSource('facilities'), ...fromSource('home').slice(0, 6)].filter((v, i, arr) => arr.indexOf(v) === i), video: null, tag: 'campus' as const };
     const alumni = { id: 'alumni', title: tr('Alumni gathering', 'Mkusanyiko wa wahitimu'), text: '', images: fromSource('alumni'), video: null, tag: 'events' as const };
     return [...fromPosts, ...fromAlbums, campus, alumni].filter((g) => g.images.length);
@@ -47,6 +47,7 @@ export default function Gallery() {
   return (
     <>
       <PageHero
+        page="gallery"
         kicker={tr('GALLERY', 'PICHA')}
         title={tr('Snapshots of success.', 'Picha za mafanikio.')}
         lead={tr(`${total} photos and ${videos.length} videos of classrooms, labs, sports, culture, trips and celebrations across our campuses.`, `Picha ${total} na video ${videos.length} za madarasa, maabara, michezo, utamaduni, ziara na sherehe.`)}

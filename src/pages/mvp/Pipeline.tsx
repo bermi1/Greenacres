@@ -1,21 +1,12 @@
 import { useState } from 'react';
+import { db, STAGES, useDb, type Application, type Stage } from '../../data/db';
 import { Sparkles } from 'lucide-react';
 import StaffShell, { btnGhost, btnPrimary, card } from '../../components/StaffShell';
 import { Toast } from '../../components/ui';
 
-const STAGES = ['Applied', 'Interview', 'Offered', 'Fee paid', 'Enrolled'];
 const COLORS = ['text-ink-3', 'text-sky-600', 'text-gold-700', 'text-green-600', 'text-green-800'];
-
-type App = { id: number; name: string; level: string; mode: string; stage: number; docs: number; phone: string };
-const START: App[] = [
-  { id: 1, name: 'Neema J. Mushi', level: 'Form One', mode: 'Boarding', stage: 0, docs: 2, phone: '+255 7•• ••• 412' },
-  { id: 2, name: 'Baraka S. Mwita', level: 'Form One', mode: 'Day', stage: 0, docs: 3, phone: '+255 6•• ••• 088' },
-  { id: 3, name: 'Rehema A. Kimaro', level: 'Form Five', mode: 'Boarding', stage: 1, docs: 3, phone: '+255 7•• ••• 251' },
-  { id: 4, name: 'Ibrahim K. Said', level: 'Primary', mode: 'Day', stage: 1, docs: 1, phone: '+255 7•• ••• 930' },
-  { id: 5, name: 'Grace P. Lyimo', level: 'Form One', mode: 'Boarding', stage: 2, docs: 3, phone: '+255 6•• ••• 517' },
-  { id: 6, name: 'Joseph M. Massawe', level: 'Pre-Form 1', mode: 'Day', stage: 3, docs: 3, phone: '+255 7•• ••• 664' },
-  { id: 7, name: 'Amina H. Bakari', level: 'Nursery', mode: 'Day', stage: 4, docs: 3, phone: '+255 7•• ••• 302' },
-];
+type App = { id: string; ref: string; name: string; level: string; mode: string; stage: Stage; docs: number; phone: string; isNew: boolean };
+const toView = (a: Application): App => ({ id: a.id, ref: a.ref, name: a.student.name || 'Unnamed', level: a.level, mode: a.mode, stage: a.stage, docs: [a.docs.birth, a.docs.report, a.docs.photo].filter(Boolean).length, phone: a.parent.phone, isNew: !a.sample });
 
 const smsFor = (a: App) => {
   const f = a.name.split(' ')[0];
@@ -37,8 +28,9 @@ const aiFor = (a: App) =>
         : 'Documents complete and readable. No issues found.';
 
 export default function Pipeline() {
-  const [apps, setApps] = useState(START);
-  const [sel, setSel] = useState(3);
+  const raw = useDb((t) => t.applications);
+  const apps = raw.map(toView);
+  const [sel, setSel] = useState(apps[0]?.id ?? '');
   const [toast, setToast] = useState('');
   const a = apps.find((x) => x.id === sel) ?? apps[0];
   const done = a.stage >= 4;
@@ -46,7 +38,7 @@ export default function Pipeline() {
 
   const advance = () => {
     if (done) return;
-    setApps(apps.map((x) => (x.id === a.id ? { ...x, stage: x.stage + 1 } : x)));
+    db.moveApplication(a.id, (a.stage + 1) as Stage);
     setToast(`Moved ${a.name} to ${STAGES[a.stage + 1]}. SMS sent from GREENACRES.`);
   };
 
@@ -84,7 +76,7 @@ export default function Pipeline() {
                   </div>
                   {items.map((x) => (
                     <button key={x.id} type="button" onClick={() => setSel(x.id)} aria-pressed={sel === x.id} className={`flex flex-col gap-1.5 rounded-xl bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-md animate-pop ${sel === x.id ? 'border-2 border-green-600' : 'border border-line'}`}>
-                      <span className="text-sm font-bold">{x.name}</span>
+                      <span className="flex items-center gap-1.5 text-sm font-bold">{x.name}{x.isNew && <span className="rounded-full bg-gold-400 px-1.5 text-[10px] font-bold text-ink">NEW</span>}</span>
                       <span className="text-xs text-ink-3">{x.level} · {x.mode}</span>
                       <span className={`self-start rounded-full px-2 py-0.5 text-[11px] font-bold ${x.docs < 3 ? 'bg-[#FFF1D6] text-[#8A4B00]' : 'bg-green-100 text-green-600'}`}>{x.docs < 3 ? `${3 - x.docs} doc missing` : 'Docs complete'}</span>
                     </button>
@@ -100,7 +92,7 @@ export default function Pipeline() {
             <div className="grid h-12 w-12 place-items-center rounded-full bg-green-100 font-display font-extrabold text-green-600">{initials}</div>
             <div>
               <div className="font-display text-lg font-extrabold">{a.name}</div>
-              <div className="text-[13px] text-ink-3">GA-27-0{140 + a.id} · {a.level} · {a.mode}</div>
+              <div className="text-[13px] text-ink-3">{a.ref} · {a.level} · {a.mode}</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2.5 text-[13px]">
@@ -117,7 +109,7 @@ export default function Pipeline() {
           <button type="button" onClick={advance} disabled={done} className={done ? 'min-h-[48px] rounded-xl bg-green-100 text-sm font-bold text-green-600' : btnGold + ' min-h-[48px]'}>
             {done ? 'Enrolled · synced to ForShule' : `Move to ${STAGES[a.stage + 1]} and send SMS`}
           </button>
-          <div className="text-xs text-ink-3">Moving a stage sends the SMS above. Staff can edit it first. Sample applicants.</div>
+          <div className="text-xs text-ink-3">Moving a stage sends the SMS above. Staff can edit it first. Applications from the website appear here marked NEW.</div>
         </aside>
       </div>
     </StaffShell>

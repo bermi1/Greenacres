@@ -22,6 +22,7 @@ export default function About() {
   return (
     <>
       <PageHero
+        page="about"
         kicker={tr('ABOUT US', 'KUHUSU SISI')}
         title={tr('Twenty-five years of shaping Tanzania’s future.', 'Miaka ishirini na tano ya kujenga mustakabali wa Tanzania.')}
         lead={tr('Since 2000, Green Acres Schools has provided quality education that shapes bright minds and strong, principled leaders.', 'Tangu 2000, Green Acres Schools imetoa elimu bora inayojenga akili angavu na viongozi wenye misingi imara.')}

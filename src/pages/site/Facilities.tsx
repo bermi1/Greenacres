@@ -11,6 +11,7 @@ export default function Facilities() {
   return (
     <>
       <PageHero
+        page="facilities"
         kicker={tr('FACILITIES', 'MIUNDOMBINU')}
         title={tr('Spaces built for learning, living and growing.', 'Mazingira ya kujifunza, kuishi na kukua.')}
         lead={tr('Modern labs, a connected computer lab, safe boarding, a green sports field and a dispensary on campus.', 'Maabara za kisasa, maabara ya kompyuta, bweni salama, uwanja wa kijani na zahanati ndani ya shule.')}

@@ -3,6 +3,7 @@ import { Sparkles } from 'lucide-react';
 import StaffShell, { card } from '../../components/StaffShell';
 import { Toast } from '../../components/ui';
 import { fmt, smsParts, SMS_RATE } from '../../lib/format';
+import { db } from '../../data/db';
 
 const AUD: [string, string, number][] = [['all', 'All parents', 1200], ['f1', 'Form One 2027 applicants', 180], ['board', 'Boarding parents', 420], ['alevel', 'A-Level parents', 260], ['bunazi', 'Bunazi campus', 310], ['unpaid', 'Fees outstanding', 95]];
 const TPL: Record<string, { label: string; sw: string; en: string }> = {
@@ -29,7 +30,7 @@ export default function Messaging() {
 
   return (
     <StaffShell kicker="SENDER ID · GREENACRES · POWERED BY BERMI CONNECT" title="Send a notice to parents">
-      {sent && <div className="mb-4"><Toast text={`Sent to ${fmt(n)} parents from GREENACRES. Delivery report is updating live.`} /></div>}
+      {sent && <div className="mb-4"><Toast text={`Sent to ${fmt(n)} parents from GREENACRES. Logged in Bulk SMS campaigns.`} /></div>}
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           <section className={`${card} p-5`}>
@@ -82,8 +83,8 @@ export default function Messaging() {
             ))}
             <div className="h-px bg-line" />
             <div className="flex items-baseline justify-between"><span className="font-bold">Cost</span><span className="font-display text-2xl font-extrabold">TZS {fmt(total * SMS_RATE)}</span></div>
-            <button type="button" onClick={() => setSent(true)} className="mt-1 min-h-[50px] rounded-xl bg-gold-400 text-[15px] font-extrabold text-ink">Send now</button>
-            <div className="text-xs text-ink-3">Delivery report and replies appear in Bulk SMS. Recipient counts are sample figures; nothing is sent in this demo.</div>
+            <button type="button" disabled={sent} onClick={() => { db.sendCampaign({ name: custom ? msg.slice(0, 40) : TPL[tpl].label, lang: lang === 'sw' ? 'Kiswahili' : 'English', audience: AUD.find((a) => a[0] === aud)![1], sent: total }); setSent(true); }} className="mt-1 min-h-[50px] rounded-xl bg-gold-400 text-[15px] font-extrabold text-ink">Send now</button>
+            <div className="text-xs text-ink-3">Delivery report and replies appear in Bulk SMS. Recipient counts come from contact groups. Messages go out once the Bermi Connect SMS account is linked.</div>
           </div>
         </aside>
       </div>

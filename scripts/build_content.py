@@ -47,6 +47,10 @@ class Blocks(HTMLParser):
 
 EMOJI = re.compile('[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D\u25B6\u23E9-\u23FA]')
 JUNK = {'powered by embedpress', 'click here', 'click below to view the results.', 'you can view the results through the link below:'}
+def nodash(t):
+    t = re.sub(r'(\d)\s*[\u2013\u2014]\s*(\d)', r'\1 to \2', t)
+    return re.sub(r'\s*[\u2013\u2014]\s*', ', ', t)
+
 CATS = {1: 'News', 9: 'Blog', 13: 'Results'}
 outp = []
 for p in posts:
@@ -66,6 +70,7 @@ for p in posts:
         'category': 'Results' if 'Results' in cats else cats[0], 'excerpt': ex[:260], 'cover': cover,
         'images': imgs, 'hasVideo': bool(vids), 'blocks': b.blocks,
     })
+outp = json.loads(nodash(json.dumps(outp, ensure_ascii=False)))
 json.dump(outp, open(f'{out}/posts.json', 'w'), ensure_ascii=False, indent=1)
 
 # media library: name -> w,h,where
@@ -96,5 +101,6 @@ for h, u, ptxt in tokens:
         t = html.unescape(re.sub('<[^>]+>', '', ptxt)).strip()
         if t: cur['text'] = (cur['text'] + ' ' + t).strip()
 albums = [a for a in albums if a['images'] or a['video']]
+albums = json.loads(nodash(json.dumps(albums, ensure_ascii=False)))
 json.dump(albums, open(f'{out}/albums.json', 'w'), ensure_ascii=False, indent=1)
 for a in albums: print('album', len(a['images']), a['video'], a['title'][:60])

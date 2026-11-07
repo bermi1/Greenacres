@@ -30,6 +30,7 @@ const CmsMedia = lazy(() => import('./pages/cms/Media'));
 const CmsSms = lazy(() => import('./pages/cms/BulkSMS'));
 const CmsResults = lazy(() => import('./pages/cms/Results'));
 const CmsSettings = lazy(() => import('./pages/cms/Settings'));
+const CmsInbox = lazy(() => import('./pages/cms/Inbox'));
 
 function Loading() {
   return (
@@ -74,6 +75,7 @@ export default function App() {
         <Route path="cms/sms" element={<CmsSms />} />
         <Route path="cms/results" element={<CmsResults />} />
         <Route path="cms/settings" element={<CmsSettings />} />
+        <Route path="cms/inbox" element={<CmsInbox />} />
       </Routes>
     </Suspense>
   );

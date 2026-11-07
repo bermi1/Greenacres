@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import StaffShell, { Badge, btnPrimary, card } from '../../components/StaffShell';
 import { Field, Switch, Toast, inputCls } from '../../components/ui';
+import { db, useDb } from '../../data/db';
 
 const TABS = [['roles', 'Users & roles'], ['profile', 'School profile'], ['integrations', 'Integrations'], ['privacy', 'Data protection']] as const;
 const PERMS = ['Website', 'News', 'Admissions', 'Bulk SMS', 'Results', 'Staff', 'Settings'];
@@ -10,7 +11,9 @@ const INTEG: [string, string, string][] = [['forshule', 'ForShule export', 'Send
 
 export default function Settings() {
   const [tab, setTab] = useState<(typeof TABS)[number][0]>('roles');
-  const [grid, setGrid] = useState(DEF);
+  const savedRoles = useDb((t) => t.roles);
+  const audit = useDb((t) => t.audit);
+  const [grid, setGrid] = useState(savedRoles ?? DEF);
   const [integ, setInteg] = useState<Record<string, boolean>>({ forshule: true, momo: true, sms: true, ga: true });
   const [toast, setToast] = useState('');
 
@@ -36,7 +39,7 @@ export default function Settings() {
                 ))}
               </tbody>
             </table>
-            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"><span className="text-xs text-ink-3">Every change is written to the audit log.</span><button type="button" className={btnPrimary} onClick={() => setToast('Permissions saved and logged.')}>Save permissions</button></div>
+            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"><span className="text-xs text-ink-3">Every change is written to the audit log.</span><button type="button" className={btnPrimary} onClick={() => { db.saveRoles(grid); setToast('Permissions saved and logged.'); }}>Save permissions</button></div>
           </div>
         )}
         {tab === 'profile' && (
@@ -79,8 +82,8 @@ export default function Settings() {
               </div>
               <div className={`${card} p-5`}>
                 <div className="mb-2 font-bold">Audit log</div>
-                {[['AM', 'Moved GA-27-0145 to Offered', 'today'], ['JR', 'Published Home page (SW)', 'today'], ['SK', 'Sent "Results out" to 1,200 parents', 'yesterday'], ['AM', 'Exported 2 students to ForShule', 'yesterday']].map(([w, x, t]) => <div key={x} className="flex gap-3 border-b border-paper-2 py-2 text-sm"><span className="font-bold">{w}</span><span className="flex-1">{x}</span><span className="text-ink-3">{t}</span></div>)}
-                <div className="mt-2 text-xs text-ink-3">Sample entries.</div>
+                {(audit.length ? audit.slice(0, 8).map((a) => [a.who, a.what, new Date(a.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })]) : [['', 'Nothing logged yet.', '']]).map(([w, x, t]) => <div key={x} className="flex gap-3 border-b border-paper-2 py-2 text-sm"><span className="font-bold">{w}</span><span className="flex-1">{x}</span><span className="text-ink-3">{t}</span></div>)}
+                <button type="button" className="mt-3 text-xs font-semibold text-clay-500" onClick={() => { if (confirm('Clear all saved data in this browser and restore the starting sample data?')) db.reset(); }}>Reset data in this browser</button>
               </div>
             </section>
           </div>

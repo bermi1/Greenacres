@@ -4,20 +4,22 @@ import StaffShell, { btnPrimary, card } from '../../components/StaffShell';
 import { Field, Toast, inputCls } from '../../components/ui';
 import { fromSource, img, poster, thumb } from '../../lib/media';
 import { albums, posts, videos } from '../../content/site';
+import { db, useDb } from '../../data/db';
 
 export default function Media() {
   const albumList = useMemo(() => {
     const list: { label: string; items: string[] }[] = [
       { label: 'Campus', items: fromSource('facilities') },
       ...posts.filter((p) => p.images.length > 4).map((p) => ({ label: p.title.replace(/^Green Acres (Schools )?/, '').slice(0, 34), items: p.images })),
-      ...albums.map((a) => ({ label: a.title.split(/! | – /)[0].slice(0, 34), items: a.images })),
+      ...albums.map((a) => ({ label: a.title.split(/! |, /)[0].slice(0, 34), items: a.images })),
       { label: 'Alumni', items: fromSource('alumni') },
     ];
     return [{ label: 'All', items: Array.from(new Set(list.flatMap((a) => a.items))) }, ...list];
   }, []);
   const [album, setAlbum] = useState('All');
   const [sel, setSel] = useState(albumList[0].items[0]);
-  const [alts, setAlts] = useState<Record<string, string>>({});
+  const alts = useDb((t) => t.mediaAlt);
+  const setAlts = (next: Record<string, string>) => db.setAlt(sel, next[sel] ?? '');
   const [extra, setExtra] = useState<string[]>([]);
   const [toast, setToast] = useState('');
   const [tab, setTab] = useState<'photos' | 'videos'>('photos');

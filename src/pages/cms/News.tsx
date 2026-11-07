@@ -4,22 +4,23 @@ import { Field, Switch, Toast, inputCls } from '../../components/ui';
 import { posts } from '../../content/site';
 import { thumb } from '../../lib/media';
 import { fmt, niceDate, SMS_RATE } from '../../lib/format';
+import { db, useDb } from '../../data/db';
 
 const AUD: [string, string, number][] = [['all', 'All parents', 1200], ['board', 'Boarding', 420], ['f4', 'Form Four', 150], ['bunazi', 'Bunazi', 310]];
 
 export default function News() {
   const [sel, setSel] = useState(0);
   const [filter, setFilter] = useState('All');
-  const [status, setStatus] = useState<Record<number, string>>({});
+  const status = useDb((t) => t.postStatus);
   const [sms, setSms] = useState(true);
   const [aud, setAud] = useState('all');
   const [toast, setToast] = useState('');
-  const all = posts.map((p, i) => ({ ...p, i, status: status[i] ?? 'Published' }));
+  const all = posts.map((p, i) => ({ ...p, i, status: status[p.slug] ?? 'Published' }));
   const shown = all.filter((p) => filter === 'All' || p.status === filter);
   const c = all[sel];
   const n = AUD.find((a) => a[0] === aud)![2];
   const tone = (s: string) => (s === 'Published' ? 'green' : s === 'Scheduled' ? 'blue' : 'gold') as 'green' | 'blue' | 'gold';
-  const setSt = (st: string, msg: string) => { setStatus({ ...status, [c.i]: st }); setToast(msg); };
+  const setSt = (st: 'Published' | 'Draft' | 'Scheduled', msg: string) => { db.setPostStatus(c.slug, st); setToast(msg); };
   const smsText = `Green Acres: ${c.title.slice(0, 80)}. Soma zaidi: greenacres.ac.tz/news`;
 
   return (
@@ -47,7 +48,7 @@ export default function News() {
               </span>
             </button>
           ))}
-          <div className="text-xs text-ink-3">{posts.length} posts imported from the current website.</div>
+          <div className="text-xs text-ink-3">{posts.length} posts. Drafts and scheduled posts are hidden from the public website.</div>
         </section>
 
         <section className={`${card} flex flex-col gap-4 p-5`}>

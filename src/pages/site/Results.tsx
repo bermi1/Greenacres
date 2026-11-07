@@ -17,6 +17,7 @@ export default function Results() {
   return (
     <>
       <PageHero
+        page="results"
         kicker={tr('RESULTS & PUBLICATIONS', 'MATOKEO NA MACHAPISHO')}
         title={tr('Our results, readable on any phone.', 'Matokeo yetu, yanasomeka kwa simu yoyote.')}
         lead={tr('National examination results as real text and numbers, not just pictures, so every parent can read and search them.', 'Matokeo ya mitihani ya taifa kama maandishi na namba halisi, si picha pekee, ili kila mzazi ayasome na kuyatafuta.')}

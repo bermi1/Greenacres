@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import StaffShell, { Badge, btnPrimary, card } from '../../components/StaffShell';
 import { Field, Pill, Switch, Toast, inputCls } from '../../components/ui';
 import { thumb } from '../../lib/media';
+import { db, useDb } from '../../data/db';
 
 const PEOPLE: [string, string, string, string, string, string, string?][] = [
   ['Jacklyne Siima Rushaigo', 'Managing Director', 'Administration', 'Salasala', 'Admin', 'From current website', 'jacklyne-siima-rushaigo'],
@@ -18,7 +19,8 @@ const PEOPLE: [string, string, string, string, string, string, string?][] = [
 export default function Staff() {
   const [dept, setDept] = useState('All');
   const [campus, setCampus] = useState('All');
-  const [web, setWeb] = useState<Record<number, boolean>>({ 0: true, 1: true });
+  const web = useDb((t) => t.staffOnWebsite) as Record<number, boolean>;
+  const setWeb = (next: Record<number, boolean>) => Object.entries(next).forEach(([k, v]) => v !== web[Number(k)] && db.setStaffOnWebsite(k, v));
   const [drawer, setDrawer] = useState(false);
   const [toast, setToast] = useState('');
   const rows = PEOPLE.map((p, i) => ({ p, i })).filter(({ p }) => (dept === 'All' || p[2] === dept) && (campus === 'All' || p[3] === campus));

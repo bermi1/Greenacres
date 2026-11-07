@@ -17,7 +17,7 @@ What works for real today, with no backend:
 - Alumni registration opens an email to info@greenacres.ac.tz with the details filled in.
 - Joining instructions download as PDFs. Videos play in a built-in viewer.
 
-Everything in `/system`, `/apply` (before the WhatsApp step), `/parent`, `/office/*` and `/cms/*` is a working prototype on sample data and is labelled as such. Nothing is sent or charged.
+All forms, the admissions pipeline and every CMS module save through one data layer (`src/data/db.ts`). Today it stores in the browser; set `VITE_API_URL` and it talks to the school database instead (schema in `db/schema.sql`, routes in `docs/API.md`). Publishing a page in the CMS changes the live website, a draft news post disappears from the site, and a website application appears in the office pipeline marked NEW.
 
 ## Run it
 
@@ -32,7 +32,7 @@ Stack: React 18, Vite 5, TypeScript, Tailwind CSS 3, React Router 6, lucide-reac
 
 ## Design
 
-Implements the "Green Acres Smart School System · MVP" design canvas (Overview, Admissions, Admissions office, Parent Hub, Messaging, Teacher AI, 10 website pages and 8 CMS modules): green `#0E6B2E`, deep green `#0B3F1D`, gold `#F5C400`, paper `#F6F8F5`, Manrope headings and Inter body. Real photography replaces every placeholder, and the real school crest replaces the "GA" monogram.
+Implements the "Green Acres Smart School System · MVP" design canvas (Overview, Admissions, Admissions office, Parent Hub, Messaging, Teacher AI, 10 website pages and 8 CMS modules): deep forest `#04190C` to crest green `#0E6B2E`, gold `#F5C400`, terracotta `#D9643A`, ivory `#FAF7EF`, Fraunces serif headlines and Plus Jakarta Sans body. Real photography replaces every placeholder, and the real school crest replaces the "GA" monogram.
 
 Motion is gentle and respects `prefers-reduced-motion`: hero cross-fade with a slow zoom, fade-up on scroll, count-up stats, a photo marquee and a full-screen photo/video viewer (keyboard arrows and Esc).
 

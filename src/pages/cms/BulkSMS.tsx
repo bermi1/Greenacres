@@ -4,9 +4,9 @@ import { BadgeCheck, Sparkles, Upload } from 'lucide-react';
 import StaffShell, { Badge, btnGhost, btnGold, btnPrimary, card } from '../../components/StaffShell';
 import { Toast } from '../../components/ui';
 import { fmt, SMS_RATE } from '../../lib/format';
+import { useDb } from '../../data/db';
 
 const TABS = [['campaigns', 'Campaigns'], ['groups', 'Contact groups'], ['templates', 'Templates'], ['sender', 'Sender ID'], ['credits', 'Credits'], ['replies', 'Replies inbox']] as const;
-const CAMPAIGNS: [string, string, string, number, number][] = [['Mid-term results out', 'Kiswahili', 'All parents', 1200, 1176], ['Fee reminder, term 1', 'Kiswahili', 'Fees outstanding', 95, 93], ['Form One interview invite', 'Bilingual', '2027 applicants', 180, 178], ['Visiting day', 'Kiswahili', 'Boarding parents', 420, 411], ['Cultural Day', 'English', 'All parents', 1200, 1181]];
 const GROUPS: [string, number, string, string][] = [['All parents', 1200, 'ForShule export', 'synced daily'], ['2027 applicants', 180, 'Admissions', 'live'], ['Boarding parents', 420, 'ForShule export', 'synced daily'], ['A-Level parents', 260, 'ForShule export', 'synced daily'], ['Bunazi campus', 310, 'ForShule export', 'synced daily'], ['Alumni', 0, 'Manual', 'CSV import']];
 const TEMPLATES = [
   { name: 'Results released', sw: 'Green Acres: Matokeo ya {mtihani} yametolewa. Angalia Parent Hub.', en: 'Green Acres: {exam} results are out. Check the Parent Hub.' },
@@ -25,6 +25,7 @@ const REPLIES = [
 export default function BulkSMS() {
   const [tab, setTab] = useState<(typeof TABS)[number][0]>('campaigns');
   const [reply, setReply] = useState(0);
+  const campaigns = useDb((t) => t.campaigns);
   const [toast, setToast] = useState('');
   const cur = REPLIES[reply];
   const max = Math.max(...MONTHS.map((m) => m[1]));
@@ -44,7 +45,7 @@ export default function BulkSMS() {
             <table className="w-full min-w-[720px] border-collapse text-left text-sm">
               <thead><tr className="border-b border-line text-[11px] tracking-wider text-ink-3">{['CAMPAIGN', 'AUDIENCE', 'SENT', 'DELIVERED', 'FAILED', 'COST (TZS)'].map((h) => <th key={h} className="px-4 py-3 font-bold">{h}</th>)}</tr></thead>
               <tbody>
-                {CAMPAIGNS.map(([name, lang, aud, sent, del]) => (
+                {campaigns.map(({ name, lang, audience: aud, sent, delivered: del }) => (
                   <tr key={name} className="border-b border-paper-2">
                     <td className="px-4 py-3"><div className="font-bold">{name}</div><div className="text-xs text-ink-3">{lang}</div></td>
                     <td className="px-4 py-3">{aud}</td>
@@ -56,7 +57,7 @@ export default function BulkSMS() {
                 ))}
               </tbody>
             </table>
-            <div className="px-4 py-3 text-xs text-ink-3">Sample campaign history. Cost = SMS sent × TZS {SMS_RATE}.</div>
+            <div className="px-4 py-3 text-xs text-ink-3">Campaign history. New sends from Send notices appear at the top. Cost = SMS parts × TZS {SMS_RATE}.</div>
           </div>
         )}
 

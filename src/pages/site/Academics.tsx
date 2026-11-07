@@ -27,6 +27,7 @@ export default function Academics() {
   return (
     <>
       <PageHero
+        page="academics"
         kicker={tr('ACADEMICS', 'TAALUMA')}
         title={tr('A complete journey, from Nursery to A-Level.', 'Safari kamili, kutoka Awali hadi A-Level.')}
         lead={tr('Strong academic foundations, values-based education and co-curricular enrichment, taught by dedicated teachers at every stage.', 'Misingi imara ya kitaaluma, elimu ya maadili na shughuli za ziada, zikifundishwa na walimu waliojitoa katika kila hatua.')}
