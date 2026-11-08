@@ -64,9 +64,9 @@ export default function StaffShell({ kicker, title, actions, children }: { kicke
           {MODULES.map((m) => <Item key={m.to} {...m} />)}
           <div className="hidden px-3 pb-1 pt-4 text-[11px] font-bold tracking-wider text-[#9FC2AA] lg:block">SCHOOL OFFICE</div>
           {OFFICE.map((m) => <Item key={m.to} {...m} />)}
-          <a href="/" className="flex flex-none items-center gap-2.5 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm text-[#CFE6D5] no-underline hover:text-white">
+          <Link to="/" className="flex flex-none items-center gap-2.5 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm text-[#CFE6D5] no-underline hover:text-white">
             <ExternalLink className="h-[18px] w-[18px]" aria-hidden="true" /> View website
-          </a>
+          </Link>
         </div>
         <div className="mt-auto hidden px-5 py-5 text-xs leading-relaxed text-[#9FC2AA] lg:block">
           <span className="mb-3 flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-[#CFE6D5]"><Database className="h-4 w-4 flex-none text-gold-400" />{storageMode === 'remote' ? 'Connected to school database' : 'Saving in this browser · set VITE_API_URL to go live'}</span>

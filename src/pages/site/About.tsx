@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Quote } from 'lucide-react';
 import { useLang } from '../../lib/i18n';
+import { thumb } from '../../lib/media';
 import { campuses } from '../../content/site';
 import { PageHero, Photo, Reveal, SectionHead, useLightbox } from '../../components/ui';
 import { ApplyBanner } from '../../components/SiteLayout';
@@ -69,7 +70,7 @@ export default function About() {
             <div>
               <div className="font-display text-xl font-extrabold">Dr Juliani Rushaigo Bujugo</div>
               <div className="text-sm text-ink-3">{tr('Co-Founder, Green Acres Schools', 'Mwanzilishi mwenza, Green Acres Schools')}</div>
-              <img src="/media/thumb/25-years.webp" alt={tr('25th anniversary emblem', 'Nembo ya miaka 25')} className="mt-4 h-20 w-auto" loading="lazy" />
+              <img src={thumb('25-years')} alt={tr('25th anniversary emblem', 'Nembo ya miaka 25')} className="mt-4 h-20 w-auto" loading="lazy" />
             </div>
           </Reveal>
         </div>

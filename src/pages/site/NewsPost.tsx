@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CalendarDays, Share2 } from 'lucide-react';
 import { useLang } from '../../lib/i18n';
 import { niceDate } from '../../lib/format';
+import { img } from '../../lib/media';
 import { posts, school } from '../../content/site';
 import { Photo, Reveal, VideoTile, useLightbox } from '../../components/ui';
 import NotFound from './NotFound';
@@ -20,7 +21,7 @@ export default function NewsPost() {
   return (
     <article>
       <header className="relative overflow-hidden bg-green-800 text-white">
-        {p.cover && <img src={`/media/img/${p.cover}.webp`} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35 animate-kenburns motion-reduce:animate-none" />}
+        {p.cover && <img src={img(p.cover)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35 animate-kenburns motion-reduce:animate-none" />}
         <div className="absolute inset-0 bg-gradient-to-t from-green-900 via-green-900/70 to-green-800/30" />
         <div className="relative mx-auto max-w-3xl px-4 pb-14 pt-16 sm:px-8 sm:pt-24">
           <Link to="/news" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#CFE6D5] no-underline hover:text-white">

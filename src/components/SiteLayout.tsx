@@ -3,12 +3,12 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
 import { ArrowRight, ArrowUpRight, Check, ChevronDown, Facebook, Instagram, Menu, MessageCircle, Twitter, X } from 'lucide-react';
 import { useLang } from '../lib/i18n';
-import { thumb } from '../lib/media';
+import { brand, thumb } from '../lib/media';
 import { campuses, school } from '../content/site';
 import { db } from '../data/db';
 
 export function Crest({ className = 'h-11 w-11' }: { className?: string }) {
-  return <img src="/brand/crest-192.png" alt="" className={`${className} flex-none rounded-xl bg-white object-contain p-0.5`} />;
+  return <img src={brand('crest-192.png')} alt="" className={`${className} flex-none rounded-xl bg-white object-contain p-0.5`} />;
 }
 
 export function LangToggle({ dark }: { dark?: boolean }) {
@@ -192,7 +192,7 @@ function Footer() {
       <div className="relative mx-auto max-w-7xl px-4 pt-16 sm:px-8">
         <div className="grid gap-10 border-b border-white/10 pb-12 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <img src="/brand/logo-white.png" alt="Green Acres Schools" className="h-20 w-auto" />
+            <img src={brand('logo-white.png')} alt="Green Acres Schools" className="h-20 w-auto" />
             <p className="mt-4 max-w-sm text-white/70">{tr('Nursery to A-Level since 2000. Where young minds grow, and leaders are made.', 'Awali hadi A-Level tangu 2000. Mahali akili changa hukua, na viongozi huandaliwa.')}</p>
             <form onSubmit={join} className="mt-6 max-w-sm">
               <label htmlFor="ft-sub" className="text-sm font-bold">{tr('School news by SMS or email', 'Habari za shule kwa SMS au barua pepe')}</label>
