@@ -235,6 +235,7 @@ function Footer() {
         <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-2 px-4 py-4 text-[13px] text-white/75 sm:px-8">
           <span>© {new Date().getFullYear()} Green Acres Schools Tanzania. All rights reserved.</span>
           <span className="flex gap-4">
+            <Link to="/akili" className="text-white/75 no-underline hover:text-white">Akili Learn</Link>
             <Link to="/parent" className="text-white/75 no-underline hover:text-white">Parent Hub</Link>
             <Link to="/cms" className="text-white/75 no-underline hover:text-white">{tr('Staff sign in', 'Ingia (watumishi)')}</Link>
           </span>

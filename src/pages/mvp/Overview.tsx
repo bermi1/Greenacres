@@ -9,7 +9,9 @@ const TILES = [
   { to: '/parent', n: '03 · PARENT', h: 'Parent Hub', p: 'Notices, results, fees and an assistant that answers in Kiswahili.', c: 'text-green-600' },
   { to: '/office/messages', n: '04 · SCHOOL OFFICE', h: 'Send notices', p: 'Target any group of parents by SMS, with the live cost before you send.', c: 'text-gold-700' },
   { to: '/office/teacher-ai', n: '05 · TEACHER', h: 'Teacher copilot', p: 'NECTA-style practice questions drafted in seconds, always teacher-approved.', c: 'text-sky-600' },
-  { to: '/cms', n: '06 · STAFF', h: 'Control Centre (CMS)', p: 'Edit the website in English and Kiswahili, publish news, results and photos.', c: 'text-sky-600' },
+  { to: '/akili', n: '06 · STUDENT', h: 'Akili Learn', p: 'Adaptive learning from the teacher’s own notes, with hints and Kiswahili explanations.', c: 'text-green-600' },
+  { to: '/office/akili', n: '07 · ACADEMIC OFFICE', h: 'Akili Studio', p: 'Results insights, notes to lessons and parent summaries.', c: 'text-green-600' },
+  { to: '/cms', n: '08 · STAFF', h: 'Control Centre (CMS)', p: 'Edit the website in English and Kiswahili, publish news, results and photos.', c: 'text-sky-600' },
 ];
 
 export default function Overview() {

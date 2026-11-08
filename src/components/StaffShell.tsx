@@ -16,6 +16,7 @@ const MODULES = [
   { to: '/cms/settings', label: 'Settings', icon: Settings },
 ];
 const OFFICE = [
+  { to: '/office/akili', label: 'Akili AI', icon: Sparkles },
   { to: '/office/admissions', label: 'Admissions', icon: ClipboardCheck },
   { to: '/office/messages', label: 'Send notices', icon: MessageSquare },
   { to: '/office/teacher-ai', label: 'Teacher AI', icon: Sparkles },

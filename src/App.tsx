@@ -31,6 +31,8 @@ const CmsSms = lazy(() => import('./pages/cms/BulkSMS'));
 const CmsResults = lazy(() => import('./pages/cms/Results'));
 const CmsSettings = lazy(() => import('./pages/cms/Settings'));
 const CmsInbox = lazy(() => import('./pages/cms/Inbox'));
+const AkiliLearn = lazy(() => import('./pages/akili/Learn'));
+const AkiliStudio = lazy(() => import('./pages/akili/Studio'));
 
 function Loading() {
   return (
@@ -66,6 +68,8 @@ export default function App() {
         <Route path="office/admissions" element={<Pipeline />} />
         <Route path="office/messages" element={<Messaging />} />
         <Route path="office/teacher-ai" element={<TeacherAI />} />
+        <Route path="office/akili" element={<AkiliStudio />} />
+        <Route path="akili" element={<AkiliLearn />} />
 
         <Route path="cms" element={<CmsDashboard />} />
         <Route path="cms/pages" element={<CmsPages />} />
