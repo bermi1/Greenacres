@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useLang } from '../lib/i18n';
 import { useDb } from '../data/db';
 import { ChevronLeft, ChevronRight, Play, X, CheckCircle2 } from 'lucide-react';
@@ -156,53 +156,27 @@ export function VideoTile({ id, title, onOpen, className = '' }: { id: string; t
 
 /* ---------- page parts ---------- */
 
-export function WordReveal({ text, className = '', delay = 0 }: { text: string; className?: string; delay?: number }) {
-  return (
-    <span className={className} aria-label={text}>
-      {text.split(' ').map((w, i) => (
-        <span key={i + w} className="inline-block overflow-hidden pb-[0.12em] align-bottom" aria-hidden="true">
-          <motion.span className="inline-block" initial={{ y: '110%' }} animate={{ y: 0 }} transition={{ delay: delay + i * 0.06, duration: 0.7, ease: [0.2, 0.7, 0.2, 1] }}>
-            {w}&nbsp;
-          </motion.span>
-        </span>
-      ))}
-    </span>
-  );
-}
-
 export function PageHero({ kicker, title, lead, photo, page, children }: { kicker: string; title: string; lead: string; photo?: string; page?: string; children?: ReactNode }) {
-  const { lang } = useLang();
+  const { lang, tr } = useLang();
   const saved = useDb((t) => (page ? t.pages[page]?.[lang] : undefined));
   const live = saved && saved.status === 'Published' ? saved : null;
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '25%']);
-  const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-  const h = live?.heading || title;
   return (
-    <section ref={ref} className="grain relative isolate overflow-hidden bg-green-900 text-white">
-      {photo && (
-        <motion.div style={{ y }} className="absolute inset-0 -z-10">
-          <img src={img(photo)} alt="" className="h-[115%] w-full object-cover animate-kenburns motion-reduce:animate-none" />
-        </motion.div>
-      )}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-green-950/95 via-green-900/80 to-green-900/30" />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-t from-green-950/60 to-transparent" />
-      <motion.div style={{ opacity: fade }} className="mx-auto max-w-7xl px-4 pb-20 pt-36 sm:px-8 sm:pb-28 sm:pt-44">
-        <div className="max-w-3xl">
-          <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3 text-xs font-bold tracking-[.22em] text-gold-400">
-            <span className="h-px w-10 bg-gold-400" />
-            {kicker}
-          </motion.div>
-          <h1 className="mt-5 font-display text-[44px] leading-[1.02] sm:text-7xl text-balance">
-            <WordReveal key={h} text={h} />
-          </h1>
-          <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">
-            {live?.intro || lead}
-          </motion.p>
-          {children && <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>{children}</motion.div>}
+    <section className="relative isolate overflow-hidden bg-green-700 text-white">
+      {photo && <img src={img(photo)} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-green-950/90 via-green-950/70 to-green-950/30" />
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-8 sm:py-24">
+        <div className="max-w-2xl animate-fadeUp">
+          <nav aria-label="Breadcrumb" className="mb-5 text-sm text-white/80">
+            <Link to="/" className="text-white/80 no-underline hover:text-white">{tr('Home', 'Nyumbani')}</Link>
+            <span className="mx-2 text-gold-400">/</span>
+            <span>{kicker.charAt(0) + kicker.slice(1).toLowerCase()}</span>
+          </nav>
+          <h1 className="m-0 font-display text-[36px] font-bold leading-[1.1] sm:text-[52px] text-balance">{live?.heading || title}</h1>
+          <span className="mt-5 block h-1 w-16 rounded-full bg-gold-400" aria-hidden="true" />
+          <p className="mb-0 mt-5 max-w-xl text-lg leading-relaxed text-white/90">{live?.intro || lead}</p>
+          {children}
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
@@ -211,13 +185,13 @@ export function SectionHead({ kicker, title, children, center, dark }: { kicker?
   return (
     <Reveal className={`mb-10 ${center ? 'text-center' : ''}`}>
       {kicker && (
-        <div className={`flex items-center gap-3 text-xs font-bold tracking-[.22em] ${center ? 'justify-center' : ''} ${dark ? 'text-gold-400' : 'text-clay-500'}`}>
-          <span className={`h-px w-8 ${dark ? 'bg-gold-400' : 'bg-clay-500'}`} />
+        <div className={`flex items-center gap-2.5 text-[13px] font-semibold uppercase tracking-[.12em] ${center ? 'justify-center' : ''} ${dark ? 'text-gold-400' : 'text-green-600'}`}>
+          <span className="h-[3px] w-8 rounded-full bg-gold-400" aria-hidden="true" />
           {kicker}
         </div>
       )}
-      <h2 className={`mt-3 font-display text-4xl leading-[1.05] sm:text-[52px] text-balance ${dark ? 'text-white' : 'text-ink'}`}>{title}</h2>
-      {children && <div className={`mt-4 text-lg leading-relaxed ${dark ? 'text-white/70' : 'text-ink-3'} ${center ? 'mx-auto max-w-2xl' : 'max-w-2xl'}`}>{children}</div>}
+      <h2 className={`m-0 mt-3 font-display text-[30px] font-bold leading-[1.15] sm:text-[40px] text-balance ${dark ? 'text-white' : 'text-ink'}`}>{title}</h2>
+      {children && <div className={`mt-4 text-[17px] leading-relaxed ${dark ? 'text-white/85' : 'text-ink-3'} ${center ? 'mx-auto max-w-2xl' : 'max-w-2xl'}`}>{children}</div>}
     </Reveal>
   );
 }
@@ -228,7 +202,7 @@ export function Pill({ on, onClick, children, className = '' }: { on: boolean; o
       type="button"
       aria-pressed={on}
       onClick={onClick}
-      className={`min-h-[42px] rounded-full border px-5 py-2 text-sm font-semibold transition ${on ? 'border-ink bg-ink text-white shadow-md' : 'border-line-2 bg-white/70 text-ink hover:border-ink'} ${className}`}
+      className={`min-h-[42px] rounded-full border px-5 py-2 text-sm font-medium transition ${on ? 'border-green-600 bg-green-600 text-white' : 'border-line-2 bg-white text-ink hover:border-green-600'} ${className}`}
     >
       {children}
     </button>
@@ -269,4 +243,4 @@ export function Field({ label, children, className = '' }: { label: string; chil
   );
 }
 
-export const inputCls = 'min-h-[48px] w-full rounded-2xl border border-line-2 bg-white px-3.5 py-2.5 text-[15px] font-normal text-ink outline-none transition focus:border-green-600 focus:ring-2 focus:ring-green-600/20';
+export const inputCls = 'min-h-[48px] w-full rounded-lg border border-line-2 bg-white px-3.5 py-2.5 text-[15px] font-normal text-ink outline-none transition focus:border-green-600 focus:ring-2 focus:ring-green-600/20';

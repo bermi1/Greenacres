@@ -4,22 +4,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        green: { 50: '#EEF7F1', 100: '#DDEFE3', 200: '#B6DEC3', 300: '#7FC496', 400: '#3FA466', 500: '#1A8644', 600: '#0E6B2E', 700: '#0B5525', 800: '#0A3F1D', 900: '#072B15', 950: '#04190C' },
-        gold: { 50: '#FFF8E1', 100: '#FFEFB8', 300: '#FFD95A', 400: '#F5C400', 500: '#E0A800', 700: '#8A6A00' },
-        clay: { 50: '#FCEEE7', 400: '#E07A4F', 500: '#D9643A', 700: '#9C3F1C' },
-        ink: { DEFAULT: '#0E1A13', 2: '#33413A', 3: '#5A665F' },
-        line: { DEFAULT: '#E4E1D6', 2: '#CFCBBE' },
-        paper: { DEFAULT: '#FAF7EF', 2: '#F1EDE2', 3: '#F5F3EB' },
-        sky: { 50: '#EAF1FB', 600: '#1F4FA8', 800: '#1E3A6E' },
+        // Green Acres brand guideline: school green #0A771A, school yellow #FFD801, crest forest #143322
+        green: { 50: '#EAF4EC', 100: '#D5EAD9', 200: '#A9D4B2', 300: '#6DB87C', 400: '#2F9A45', 500: '#128A27', 600: '#0A771A', 700: '#086117', 800: '#075214', 900: '#06461A', 950: '#143322' },
+        gold: { 50: '#FFF6C2', 100: '#FFEFA0', 300: '#FFE45A', 400: '#FFD801', 500: '#E6C200', 700: '#6B5800' },
+        clay: { 50: '#EAF4EC', 400: '#0A771A', 500: '#0A771A', 700: '#086117' },
+        ink: { DEFAULT: '#14201A', 2: '#2E3A33', 3: '#4A5750' },
+        line: { DEFAULT: '#E1E7E2', 2: '#CBD5CE' },
+        paper: { DEFAULT: '#FFFFFF', 2: '#F5F8F5', 3: '#F5F8F5' },
+        sky: { 50: '#EAF1FB', 600: '#1F5FBF', 800: '#1E3A6E' },
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['Fraunces', 'Georgia', 'serif'],
+        sans: ['Lexend', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        display: ['"Work Sans"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
       },
       boxShadow: {
         lift: '0 18px 40px rgba(14,107,46,.12)',
         card: '0 20px 50px rgba(10,40,20,.10)',
-        glow: '0 0 0 1px rgba(245,196,0,.35), 0 20px 60px -10px rgba(245,196,0,.45)',
+        glow: '0 6px 16px rgba(20,51,34,.12)',
         deep: '0 40px 80px -20px rgba(4,25,12,.45)',
       },
       keyframes: {

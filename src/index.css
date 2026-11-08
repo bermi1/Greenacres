@@ -4,25 +4,21 @@
 
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: #FAF7EF; color: #0E1A13; font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-a { color: #0E6B2E; }
-a:hover { color: #0B5525; }
-::selection { background: #F5C400; color: #0E1A13; }
-:focus-visible { outline: 3px solid #F5C400; outline-offset: 2px; border-radius: 6px; }
+body { margin: 0; background: #FFFFFF; color: #14201A; font-family: Lexend, 'Helvetica Neue', Arial, sans-serif; font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+a { color: #0A771A; }
+a:hover { color: #086117; }
+::selection { background: #FFD801; color: #14201A; }
+:focus-visible { outline: 3px solid #FFD801; outline-offset: 2px; border-radius: 6px; }
 img { max-width: 100%; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 
-/* Fraunces reads best a little lighter and tighter than a sans at the same size */
-.font-display { font-optical-sizing: auto; letter-spacing: -0.02em; }
-.font-display.font-extrabold, .font-display.font-bold { font-weight: 600; }
-.font-display em, em.font-display { font-style: italic; font-weight: 400; }
+/* Work Sans: bold, sentence case, tight. Heavier weights read too loud at display sizes. */
+.font-display { letter-spacing: -0.015em; }
+.font-display.font-extrabold { font-weight: 700; }
+.font-display em, em.font-display { font-style: normal; }
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
   .grain { position: relative; }
-  .grain::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-  .text-stroke { -webkit-text-stroke: 1.5px currentColor; color: transparent; }
-  .shine { background: linear-gradient(110deg, #F5C400 20%, #FFF1B8 40%, #F5C400 60%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
 }

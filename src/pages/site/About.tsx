@@ -34,7 +34,7 @@ export default function About() {
       <section className="mx-auto max-w-6xl overflow-hidden px-4 py-16 sm:px-8">
         <Reveal className="grid items-center gap-10 lg:grid-cols-5">
           <div className="relative mx-auto w-[calc(100%-24px)] max-w-sm lg:col-span-2">
-            <div className="absolute -inset-3 -rotate-3 rounded-[28px] bg-gold-400" aria-hidden="true" />
+            
             <Photo name="jacklyne-siima-rushaigo" alt="Jacklyne Siima Rushaigo, Managing Director" className="relative aspect-[4/5] w-full rounded-3xl" />
           </div>
           <div className="lg:col-span-3">
