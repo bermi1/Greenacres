@@ -1,44 +1,119 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Award, BookOpen, CalendarDays, Clock, Compass, Download, Eye, GraduationCap, MapPin, Medal, Palette, Play, Quote, School, Target, Tent, Trophy, Users } from 'lucide-react';
+import { ArrowRight, Award, ChevronLeft, ChevronRight, BookOpen, CalendarDays, Clock, Compass, Download, Eye, GraduationCap, MapPin, Medal, Palette, Play, Quote, School, Target, Tent, Trophy, Users } from 'lucide-react';
 import { useLang } from '../../lib/i18n';
-import { doc, img, thumb } from '../../lib/media';
+import { brand, doc, img, thumb } from '../../lib/media';
 import { niceDate } from '../../lib/format';
 import { activities, alumniVoices, events, joiningDocs, levels, posts, videos } from '../../content/site';
 import { useDb } from '../../data/db';
 import { CountUp, Photo, Reveal, SectionHead, useLightbox } from '../../components/ui';
 import { ApplyBanner } from '../../components/SiteLayout';
 
-const HERO = ['learning-in-motion-our-green-acres-teach-2', 'lab-3', '4', 'a-week-back-in-the-groove-at-green-acres'];
 const wrap = 'mx-auto max-w-7xl px-4 sm:px-8';
 
-/* 1. Hero and admission ribbon */
+/* 1. Hero: text beside an interactive 3D photo carousel, then the admission ribbon */
+const SLIDES = [
+  { n: 'learning-in-motion-our-green-acres-teach-2', en: 'Learning in motion', sw: 'Kujifunza kwa vitendo' },
+  { n: 'lab-3', en: 'Hands-on science', sw: 'Sayansi kwa vitendo' },
+  { n: '4', en: 'Friends for life', sw: 'Marafiki wa maisha' },
+  { n: 'act-culture', en: 'Cultural Day', sw: 'Siku ya Utamaduni' },
+  { n: 'graduation', en: 'Graduation', sw: 'Mahafali' },
+  { n: 'act-scouting', en: 'Scouting', sw: 'Skauti' },
+];
+
+function Carousel3D() {
+  const { tr } = useLang();
+  const [i, setI] = useState(0);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [paused, setPaused] = useState(false);
+  const drag = useRef<number | null>(null);
+  const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const n = SLIDES.length;
+  const go = (d: number) => setI((x) => (x + d + n) % n);
+  useEffect(() => {
+    if (reduce || paused) return;
+    const t = setInterval(() => setI((x) => (x + 1) % n), 4500);
+    return () => clearInterval(t);
+  }, [reduce, paused, n]);
+
+  return (
+    <div
+      className="relative mx-auto w-full max-w-[560px] select-none"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => { setPaused(false); setTilt({ x: 0, y: 0 }); }}
+      onMouseMove={(e) => {
+        if (reduce) return;
+        const r = e.currentTarget.getBoundingClientRect();
+        setTilt({ x: ((e.clientY - r.top) / r.height - 0.5) * -8, y: ((e.clientX - r.left) / r.width - 0.5) * 10 });
+      }}
+      onPointerDown={(e) => { drag.current = e.clientX; }}
+      onPointerUp={(e) => {
+        if (drag.current === null) return;
+        const dx = e.clientX - drag.current;
+        drag.current = null;
+        if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+      }}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={tr('Photos of school life', 'Picha za maisha ya shule')}
+    >
+      <div className="relative h-[340px] overflow-hidden rounded-3xl sm:h-[420px]" style={{ perspective: '1400px' }}>
+        <div className="absolute inset-0 transition-transform duration-300 ease-out" style={{ transformStyle: 'preserve-3d', transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}>
+          {SLIDES.map((s, k) => {
+            let o = k - i;
+            if (o > n / 2) o -= n;
+            if (o < -n / 2) o += n;
+            const a = Math.abs(o);
+            return (
+              <button
+                key={s.n}
+                type="button"
+                tabIndex={o === 0 ? 0 : -1}
+                aria-hidden={o !== 0}
+                onClick={() => (o === 0 ? undefined : setI(k))}
+                className="absolute left-1/2 top-1/2 h-[300px] w-[230px] overflow-hidden rounded-2xl bg-green-900 text-left shadow-[0_24px_50px_rgba(4,25,12,.45)] transition-all duration-700 ease-[cubic-bezier(.2,.7,.2,1)] sm:h-[380px] sm:w-[290px]"
+                style={{
+                  transform: `translate(-50%, -50%) translateX(${o * 48}%) translateZ(${-a * 170}px) rotateY(${o * -34}deg)`,
+                  opacity: a > 2 ? 0 : 1 - a * 0.22,
+                  zIndex: 10 - a,
+                  pointerEvents: a > 2 ? 'none' : 'auto',
+                }}
+              >
+                <img src={img(s.n)} alt={o === 0 ? tr(s.en, s.sw) : ''} className="h-full w-full object-cover" draggable={false} />
+                <span className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-green-950/90 to-transparent px-5 pb-4 pt-12 font-display text-lg font-semibold text-white transition-opacity duration-500 ${o === 0 ? 'opacity-100' : 'opacity-0'}`}>{tr(s.en, s.sw)}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <button type="button" onClick={() => go(-1)} aria-label={tr('Previous photo', 'Picha iliyotangulia')} className="grid h-11 w-11 place-items-center rounded-full border border-white/30 text-white transition hover:bg-white hover:text-green-700"><ChevronLeft className="h-5 w-5" /></button>
+        <div className="flex gap-1.5" aria-hidden="true">{SLIDES.map((s, k) => <span key={s.n} className={`h-2 rounded-full transition-all ${k === i ? 'w-7 bg-gold-400' : 'w-2 bg-white/40'}`} />)}</div>
+        <button type="button" onClick={() => go(1)} aria-label={tr('Next photo', 'Picha inayofuata')} className="grid h-11 w-11 place-items-center rounded-full border border-white/30 text-white transition hover:bg-white hover:text-green-700"><ChevronRight className="h-5 w-5" /></button>
+      </div>
+    </div>
+  );
+}
+
 function Hero() {
   const { tr, lang } = useLang();
   const saved = useDb((t) => t.pages.home?.[lang]);
   const live = saved?.status === 'Published' ? saved : null;
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const t = setInterval(() => setI((x) => (x + 1) % HERO.length), 6000);
-    return () => clearInterval(t);
-  }, []);
-
   return (
     <>
-      <section className="relative isolate overflow-hidden bg-green-950 text-white">
-        {HERO.map((n, k) => (
-          <img key={n} src={img(n)} alt="" aria-hidden="true" loading={k === 0 ? 'eager' : 'lazy'} className={`absolute inset-0 -z-20 h-full w-full object-cover transition-opacity duration-[1500ms] ${k === i ? 'opacity-100' : 'opacity-0'}`} />
-        ))}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-green-950/90 via-green-950/65 to-green-950/10" />
-        <div className={`${wrap} flex min-h-[560px] items-center py-20 sm:min-h-[600px]`}>
-          <div className="max-w-2xl animate-fadeUp">
-            <p className="m-0 text-[13px] font-semibold uppercase tracking-[.14em] text-gold-400">{tr('Welcome to Green Acres Schools', 'Karibu Green Acres Schools')}</p>
-            <h1 className="m-0 mt-4 font-display text-[40px] font-bold leading-[1.08] sm:text-[60px]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-green-950 via-green-900 to-green-700 text-white">
+        <img src={brand('logo-white.png')} alt="" aria-hidden="true" className="pointer-events-none absolute -left-24 top-1/2 h-[560px] w-auto -translate-y-1/2 opacity-[0.05]" />
+        <div className={`${wrap} relative grid items-center gap-12 py-16 lg:grid-cols-[1fr_1.05fr] lg:py-20`}>
+          <div className="animate-fadeUp">
+            <p className="m-0 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-[13px] font-semibold text-gold-400 ring-1 ring-white/15">
+              <span className="h-2 w-2 rounded-full bg-gold-400" aria-hidden="true" />
+              {tr('Form One 2027 admission is open', 'Udahili wa Kidato cha Kwanza 2027 uko wazi')}
+            </p>
+            <h1 className="m-0 mt-6 font-display text-[40px] font-bold leading-[1.08] sm:text-[58px]">
               {live?.heading ?? (
                 <>
                   {tr('Where young minds grow, and ', 'Mahali akili changa hukua, na ')}
-                  <span className="relative inline-block">
+                  <span className="relative inline-block whitespace-nowrap">
                     {tr('leaders', 'viongozi')}
                     <span className="absolute -bottom-1 left-0 h-[6px] w-full rounded-full bg-gold-400" aria-hidden="true" />
                   </span>
@@ -47,28 +122,29 @@ function Hero() {
               )}
             </h1>
             <p className="mb-0 mt-6 max-w-xl text-lg leading-relaxed text-white/90">
-              {live?.intro ?? tr('From Nursery to A-Level, we provide a caring and disciplined learning environment that inspires academic excellence, character and Tanzanian values.', 'Kuanzia Awali hadi A-Level, tunatoa mazingira ya upendo na nidhamu yanayochochea ubora wa kitaaluma, tabia njema na maadili ya Kitanzania.')}
+              {live?.intro ?? tr('From Nursery to A-Level, a caring and disciplined school that inspires academic excellence, character and Tanzanian values. Two campuses, one family, since 2000.', 'Kuanzia Awali hadi A-Level, shule yenye upendo na nidhamu inayochochea ubora wa kitaaluma, tabia njema na maadili ya Kitanzania. Kampasi mbili, familia moja, tangu 2000.')}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/apply" className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-gold-400 px-6 font-semibold text-ink no-underline transition hover:bg-gold-300">
                 {live?.cta ?? tr('Apply for 2027', 'Omba nafasi 2027')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
-              <Link to="/about" className="inline-flex min-h-[52px] items-center rounded-xl bg-green-600 px-6 font-semibold text-white no-underline transition hover:bg-green-500">
+              <Link to="/about" className="inline-flex min-h-[52px] items-center rounded-xl border-2 border-white/40 px-6 font-semibold text-white no-underline transition hover:bg-white hover:text-green-700">
                 {tr('Know us', 'Tufahamu')}
               </Link>
             </div>
+            <dl className="m-0 mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-white/15 pt-6">
+              {[['2000', tr('founded', 'ilianzishwa')], ['77/77', tr('Grade A, PSLE 2025', 'Daraja A, PSLE 2025')], ['1st', tr('in Missenyi', 'Missenyi')]].map(([v, l]) => (
+                <div key={l}><dt className="sr-only">{l}</dt><dd className="m-0 font-display text-2xl font-bold text-gold-400">{v}</dd><dd className="m-0 text-[13px] text-white/75">{l}</dd></div>
+              ))}
+            </dl>
           </div>
-        </div>
-        <div className="absolute bottom-6 right-6 hidden gap-2 sm:flex" role="group" aria-label={tr('Hero photos', 'Picha kuu')}>
-          {HERO.map((n, k) => (
-            <button key={n} type="button" onClick={() => setI(k)} aria-label={tr(`Show photo ${k + 1}`, `Onyesha picha ${k + 1}`)} aria-pressed={k === i} className={`h-2.5 rounded-full transition-all ${k === i ? 'w-8 bg-gold-400' : 'w-2.5 bg-white/60'}`} />
-          ))}
+          <Carousel3D />
         </div>
       </section>
-      <Link to="/apply" className="block bg-green-600 text-white no-underline hover:bg-green-500">
+      <Link to="/apply" className="block bg-gold-400 text-ink no-underline hover:bg-gold-300">
         <div className={`${wrap} flex flex-wrap items-center justify-center gap-x-5 gap-y-2 py-3.5 text-center`}>
           <span className="font-display text-lg font-semibold">{tr('Form One admission for 2027 is now open. Apply today.', 'Udahili wa Kidato cha Kwanza 2027 uko wazi. Omba leo.')}</span>
-          <span className="rounded-full bg-gold-400 px-4 py-1 text-sm font-semibold text-ink">{tr('Apply now', 'Omba sasa')}</span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-green-700 px-4 py-1 text-sm font-semibold text-white">{tr('Apply now', 'Omba sasa')} <ArrowRight className="h-3.5 w-3.5" /></span>
         </div>
       </Link>
     </>
@@ -181,33 +257,55 @@ function CoCurricular() {
   );
 }
 
-/* 6. Academic journey: the green band with the four levels */
+/* 6. Academic journey: four 3D flip cards (photo on the front, details on the back) */
+function FlipCard({ l, k }: { l: (typeof levels)[number]; k: number }) {
+  const { tr, lang } = useLang();
+  const [flip, setFlip] = useState(false);
+  return (
+    <div className="group h-[340px]" style={{ perspective: '1200px' }}>
+      <div
+        className={`relative h-full w-full transition-transform duration-700 ease-[cubic-bezier(.2,.7,.2,1)] [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] ${flip ? '[transform:rotateY(180deg)]' : ''}`}
+      >
+        <button type="button" onClick={() => setFlip(true)} aria-label={tr(`${l.en}: show details`, `${l.sw}: onyesha maelezo`)} className="absolute inset-0 overflow-hidden rounded-2xl text-left [backface-visibility:hidden]">
+          <img src={thumb(l.photo)} alt="" className="h-full w-full object-cover" loading="lazy" />
+          <span className="absolute inset-0 bg-gradient-to-t from-green-950/90 via-green-950/20 to-transparent" />
+          <span className="absolute left-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-gold-400 font-display font-bold text-ink">{k + 1}</span>
+          <span className="absolute inset-x-5 bottom-5 text-white">
+            <span className="block text-[13px] font-semibold uppercase tracking-[.12em] text-gold-400">{tr(l.ageEn, l.ageSw)}</span>
+            <span className="block font-display text-2xl font-bold">{tr(l.en, l.sw)}</span>
+          </span>
+        </button>
+        <div className="absolute inset-0 flex flex-col rounded-2xl bg-white p-6 text-ink [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <p className="m-0 text-[13px] font-semibold uppercase tracking-[.12em] text-green-600">{tr(l.ageEn, l.ageSw)}</p>
+          <h3 className="m-0 mt-1 font-display text-2xl font-bold text-green-600">{tr(l.en, l.sw)}</h3>
+          <ul className="m-0 mt-4 flex flex-1 list-none flex-col gap-2 p-0 text-[15px] text-ink-2">
+            {(lang === 'sw' ? l.pointsSw : l.pointsEn).map((p) => <li key={p} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-gold-500" />{p}</li>)}
+          </ul>
+          <div className="flex items-center justify-between gap-2">
+            <Link to={`/academics#${l.id}`} className="inline-flex items-center gap-1.5 font-semibold text-green-600 no-underline hover:underline">{tr('Explore', 'Gundua')} <ArrowRight className="h-4 w-4" /></Link>
+            <button type="button" onClick={() => setFlip(false)} className="rounded-full px-3 py-1.5 text-sm text-ink-3 hover:bg-paper-2 lg:hidden">{tr('Back', 'Rudi')}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Journey() {
   const { tr } = useLang();
   return (
     <section className="bg-green-600 py-20 text-white">
-      <div className={`${wrap} grid items-center gap-12 lg:grid-cols-[1fr_1.3fr]`}>
-        <div>
+      <div className={wrap}>
+        <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
           <SectionHead dark kicker={tr('Academics', 'Taaluma')} title={tr('A complete learning journey, from first steps to future leaders', 'Safari kamili ya kujifunza, kutoka hatua za kwanza hadi viongozi wa kesho')}>
-            {tr('We guide learners through every stage, from their first classroom to university preparation.', 'Tunawaongoza wanafunzi katika kila hatua, kutoka darasa la kwanza hadi maandalizi ya chuo kikuu.')}
+            {tr('Hover or tap a level to see what your child will learn.', 'Gusa ngazi kuona mtoto wako atajifunza nini.')}
           </SectionHead>
-          <Link to="/admissions" className="-mt-4 inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-gold-400 px-6 font-semibold text-ink no-underline hover:bg-gold-300">
-            {tr('Apply now', 'Omba sasa')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          <Link to="/admissions" className="mb-10 inline-flex min-h-[48px] items-center gap-2 self-end rounded-xl bg-gold-400 px-6 font-semibold text-ink no-underline hover:bg-gold-300">
+            {tr('How to apply', 'Jinsi ya kuomba')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {levels.map((l, k) => (
-            <Reveal key={l.id} delay={k * 80}>
-              <Link to={`/academics#${l.id}`} className={`group flex items-center gap-4 rounded-xl p-4 no-underline transition hover:-translate-y-1 ${k === 3 ? 'bg-gold-400 text-ink' : k === 0 ? 'bg-white text-ink' : 'border-2 border-white/40 text-white hover:bg-white/10'}`}>
-                <img src={thumb(l.photo)} alt="" className="h-20 w-20 flex-none rounded-lg object-cover" loading="lazy" />
-                <span className="flex-1">
-                  <span className="block font-display text-xl font-bold">{tr(l.en, l.sw)}</span>
-                  <span className={`block text-sm ${k === 3 || k === 0 ? 'text-ink-3' : 'text-white/80'}`}>{tr(l.ageEn, l.ageSw).toLowerCase()}</span>
-                </span>
-                <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" aria-hidden="true" />
-              </Link>
-            </Reveal>
-          ))}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {levels.map((l, k) => <FlipCard key={l.id} l={l} k={k} />)}
         </div>
       </div>
     </section>
